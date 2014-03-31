@@ -16,11 +16,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'pz_se&5271jw__!(*++-hwg%6v*l4(^x$2iuqm2y9^&+1^b6fh'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'pz_se&5271jw__!(*++-hwg%6v*l4(^x$2iuqm2y9^&+1^b6fh'
+
+if !DEBUG:
+    with open("/dev/random", 'rb') as f:
+        SECRET_KEY = str(f.read(256))
+
 
 TEMPLATE_DEBUG = True
 
@@ -54,7 +60,8 @@ ROOT_URLCONF = 'WC2048.urls'
 
 WSGI_APPLICATION = 'WC2048.wsgi.application'
 
-
+#CSRF_COOKIE_SECURE = False
+#SESSION_COOKIE_SECURE = False
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
