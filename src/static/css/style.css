@@ -50,3 +50,6 @@ ol.simple-list > li:before {
     text-align:center
 }
 
+.invisible{
+  display:none;
+}

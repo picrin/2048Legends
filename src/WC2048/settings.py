@@ -21,9 +21,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 DEBUG = True
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'pz_se&5271jw__!(*++-hwg%6v*l4(^x$2iuqm2y9^&+1^b6fh'
+SECRET_KEY = 'pz_se&5271jw__!(*++-hwg%v*l4(^x$2iuqm2y9^&+1^b6dfhd'
 
-if !DEBUG:
+if not DEBUG:
     with open("/dev/random", 'rb') as f:
         SECRET_KEY = str(f.read(256))
 

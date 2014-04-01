@@ -6,4 +6,6 @@ urlpatterns = patterns('',
     url(r'^$', views.index),
     url(r'^play$', views.play),
     url(r'^nextmove$', views.nextmove),
+    url(r'^get_board$', views.get_board),
+
 )

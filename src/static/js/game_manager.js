@@ -5,19 +5,24 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.actuator       = new Actuator;
   //this.ajax           = new XMLHttpRequest();
 
-  this.startTiles     = 2;
-
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
-  this.setup();
+  //this.setup();
+
+  this.grid           = new Grid(this.size);
+  this.requestGame();
+
+  this.score       = 0;
+  this.game_id = null;
+  
 }
 
 // Restart the game
 GameManager.prototype.restart = function () {
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
-  this.setup();
+  //this.setup();
 };
 
 // Keep playing after winning (allows going over 2048)
@@ -35,34 +40,29 @@ GameManager.prototype.isGameTerminated = function () {
   }
 };
 
-// Set up the game
-GameManager.prototype.setup = function () {
-  var previousState = this.storageManager.getGameState();
-
-  // Reload the game from a previous game if present
-  if (previousState) {
-    this.grid        = new Grid(previousState.grid.size,
-                                previousState.grid.cells); // Reload grid
-    this.score       = previousState.score;
-    this.over        = previousState.over;
-    this.won         = previousState.won;
-    this.keepPlaying = previousState.keepPlaying;
-  } else {
-    this.grid        = new Grid(this.size);
-    this.score       = 0;
-    this.over        = false;
-    this.won         = false;
-    this.keepPlaying = false;
-
-    // Add the initial tiles
-    this.addStartTiles();
-  }
-
-  // Update the actuator
-  this.actuate();
-};
-
 // Set up the initial tiles to start the game with
+GameManager.prototype.requestGame = function () {
+  var self = this;
+  //$.cookie("players_id", "foo", { path: '/' });
+  $.get("get_board", {"userid":"1051126"}).done(function(data){
+    self.game_id = data["gameid"];
+    console.log(data["board"]);
+  
+    for (var x in data["board"]) {
+      var row = data["board"][x];
+      for (var y = 0; y < row.length; y++){
+        var value = data["board"][x][y];
+        if (value != 0){
+          var tile = new Tile({x: parseInt(x), y: y}, value);
+          self.grid.insertTile(tile);
+          console.log(tile);        
+          }
+      }
+      self.actuator.actuate(self.grid, {})
+      //console.log(data["board"][x][y]);
+    }
+  });
+}
 GameManager.prototype.addStartTiles = function () {
   for (var i = 0; i < this.startTiles; i++) {
     this.addRandomTile();
@@ -135,7 +135,7 @@ function getCookie(name) {
     if (document.cookie && document.cookie != '') {
         var cookies = document.cookie.split(';');
         for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
+            var cookie = $.trim(cookies[i]);
             // Does this cookie string begin with the name we want?
             if (cookie.substring(0, name.length + 1) == (name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
@@ -154,10 +154,12 @@ $.ajaxSetup({
     crossDomain: false, // obviates need for sameOrigin test
     beforeSend: function(xhr, settings) {
         if (!csrfSafeMethod(settings.type)) {
+	    //console.log("cookie:", getCookie('csrftoken'));
             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
         }
     }
 });
+
 // Move tiles on the grid in the specified direction
 GameManager.prototype.move = function (direction) {
   /*this.ajax.open("GET", "nextmove", true);
@@ -165,6 +167,7 @@ GameManager.prototype.move = function (direction) {
   console.log(this.ajax.responseText);
   */
 $.post("nextmove", { gameid: "12q345908762459876", direction: direction }).done(function(data){
+  //this.moveTile()
   if ( console && console.log ) {
     console.log(data);
   }

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
+
   <link href="static/css/main.css" rel="stylesheet" type="text/css">
   <link rel="shortcut icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="meta/apple-touch-icon.png">
@@ -12,6 +13,10 @@
 {% endblock %}
 
 {% block body %}
+<div class="invisible">
+  {% csrf_token %}
+</div>
+
 <div class="container-fluid defaults-2048">
   <div class="container">
     <div class="heading">
