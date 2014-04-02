@@ -43,6 +43,8 @@ def nextmove(request):
     full_board = move_logic.next_board(board, *booleans)
     board = full_board[0]    
     move_logic.pretty_board(full_board[0])
-    data = simplejson.dumps(full_board[1])
-    return HttpResponse(data, mimetype='application/json')
+    resp = {}
+    resp["moves"] = full_board[1]
+    resp = simplejson.dumps(resp)
+    return HttpResponse(resp, mimetype='application/json')
 
