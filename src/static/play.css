@@ -1,0 +1,45 @@
+.gameboard{
+  background-color: #99AABD;
+  position: relative;
+  border-radius: 7px;
+  width: 370px;
+  height: 370px;
+}
+
+.tile, .tile-placeholder{
+  position: absolute;
+  border-radius: 5px;
+  width: 80px;
+  height: 80px;
+}
+
+
+.tile-placeholder{
+  background-color: #AD798A;
+}
+
+.tile{
+  background-color: #AABD99;
+  font-size: 50px;
+  font-family: Helvetica, Verdana, Arial, sans-serif;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 80px;
+}
+
+/*.moving{
+  -webkit-animation: moveright 200ms;
+  -webkit-animation-fill-mode: forwards;
+  -webkit-animation-timing-function: ease-in;
+}
+
+@-webkit-keyframes moveright
+{
+  from{left: 10px;}  
+  to {left: 70px;}
+}
+*/
+
+.table{
+  margin-left: 100px;
+}

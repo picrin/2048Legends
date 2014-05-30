@@ -1,3 +1,4 @@
+#Copyright (c) Adam Kurkiewicz 2014, all rights reserved.
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import RequestContext
@@ -27,24 +28,19 @@ def get_board(request):
     return HttpResponse(simplejson.dumps(resp), mimetype='application/json')    
 
 def nextmove(request):
-    global board    
+    global board
     direction = request.POST["direction"]
-
-    if direction == '1':
+    if direction == u'1':
         booleans = (False, True)
-    elif direction == '2':
+    elif direction == u'2':
         booleans = (True, True)        
-    elif direction == '0':
+    elif direction == u'0':
         booleans = (True, False)        
-    elif direction == '3':
+    elif direction == u'3':
         booleans = (False, False)        
     else:
         raise Http404
     full_board = move_logic.next_board(board, *booleans)
-    board = full_board[0]    
-    move_logic.pretty_board(full_board[0])
-    resp = {}
-    resp["moves"] = full_board[1]
-    resp = simplejson.dumps(resp)
-    return HttpResponse(resp, mimetype='application/json')
+    board = full_board["newboard"]
+    return HttpResponse(simplejson.dumps(full_board), mimetype='application/json')
 
