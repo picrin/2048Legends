@@ -96,6 +96,15 @@ function eachMove(moves, func){
   });
 }
 
+//call a func(index, jquery, board), for every element in tiles div
+function eachSlot(func, board){
+  $(tiles).children().each(function(index, jquery){
+    //console.lo
+    //func(index, jquery, board);
+  });
+}
+
+
 
 //------------------------------ LAYOUT FUNCTIONS ------------------------------
 //These two functions modify appropriate DOM elements adding html and css
@@ -151,17 +160,14 @@ function _moveTile(from, to, board){
   //tile that needs it, so we apply it to all tiles. Can be further worked on.
   fromTile.animate({top: leftpx, left: toppx}, quick, function(){
     $(bin).empty();
-    var revalue = getTile(to);
-    var rowCol = extractRowCol(revalue.attr("id"));
-    var is = revalue.html();
-    var shouldBe = board[rowCol[0]][rowCol[1]]
-    if( is != shouldBe ){
-      revalue.html(shouldBe);
-    }
+    stateAtIndex(true, false)(to, board);
   });
 }
 
 function preRename(from, to){
+  //this is so poorly designed, probably it would be better to keep DOM elements
+  //in a js object rather then using html ids and data attributes. That might be
+  //a good TODO, in case I'd want to improve my javascript.
   var tilefrom = getTile(from);
   var newTileID =  Mustache.render(IDTemplate, {"row_i": to[0], "col_i": to[1]});
   tilefrom.attr("data-nextid", newTileID); 
@@ -240,16 +246,89 @@ function input(key){
 
 
 //------------------------------- STATE RECOVERY -------------------------------
-//HTML is a rather poor place to keep our state in. It is understood that such
-//state can get broken any time, and thus should be closely watched and repaired
-//when necessary.
-function _stateAtIndex(index, board, repair, warn){
-}
-function _stateAtJQuery(jQuery, board, repair, warn){
+//HTML/CSS is a rather poor place to keep our state in. It is understood that
+//such state can get broken any time, and thus should be closely watched and
+//repaired when necessary.
+
+function stateAtJQuery(repair, warn){
+  return function(jQuery, board){
+    _stateAtJQuery(jQuery, board, repair, warn);
+  }
 }
 
-function checkState(board, expectedNumber){
-  var children = $(tiles).children();
+function stateAtIndex(repair, warn){
+  return function(index, board){
+    _stateAtIndex(index, board, repair, warn);
+  }
+}
+
+function _stateAtIndex(index, board, repair, warn){
+  var query = getTile(index);
+  var shouldBe = board[index[0]][index[1]];
+  if (query.length == 0 ){
+    if (warn){
+      console.log("no jquery found at index", index);
+    }
+    if (repair){
+      query = $(createTileHTML(index[0], index[1], board, false));
+      $(tiles).append(query);
+    }
+  }
+  else if (query.length == 1){
+    is = query.html()
+    if (is != shouldBe){
+      if (warn){
+        console.log("at index:", index, "is:", is, "should be:", shouldBe);
+      }
+      if (repair){
+        query.html(shouldBe);
+      }
+    }
+  } else {
+    console.log("HUSTON, WE HAVE A PROBLEM!!!");
+  }
+}
+
+function duplicates(repair, warn){
+  
+}
+
+function _stateAtJQuery(jQuery, board, repair, warn){
+  var is = jQuery.html();
+  var id = jQuery.attr("id");
+  console.log(jQuery.attr("id"));
+  /*if (id == "undefined"){
+    jQuery.remove();
+  }*/
+  var index = extractRowCol();
+  var shouldBe = board[index[0]][index[1]];
+  if( is != shouldBe ){
+    if (warn){
+      console.log("at index:", index, "is:", jQuery.html(), "should be:", shouldBe);
+    }
+    if (repair){
+      jQuery.html(shouldBe);
+    }
+  }
+}
+  
+//TODO -- not to do, broken, refactor
+function repairState(board){
+  repairJQuery = stateAtJQuery(true, true);
+  repairAtIndex = stateAtIndex(true, true);
+  $(tiles).children().each(function(_, child){
+    //console.log(child.getID());
+    repairJQuery($(child), board);
+  });
+  for(var i = 0; i < boardSize; i++){
+    for(var ii = 0; ii < boardSize; ii++){
+      if(board[i][ii] != 0){
+        repairAtIndex([i, ii], board);
+      }
+    }
+  }
+
+  /*var children = $(tiles).children();
   if (expectedNumber == children.length){
     $.each(children, function(_, htmlchild){
       var jqchild = $(htmlchild);
@@ -260,10 +339,10 @@ function checkState(board, expectedNumber){
         console.log("rowCol: ", rowCol, "is: ", is, "shouldBe: ", shouldBe);
         jqchild.html(shouldBe);
       }
-    });
-  } else {
+    });*/
+  /*} else {
     console.log("wrong number");
-  }
+  }*/
 }
 
 
@@ -292,9 +371,11 @@ $(document).keydown(function(key){
       var clearmoves = data["clear_moves"];
       var oldNo = data["oldNo"];
       var newNo = data["newNo"];
-
-      checkState(oldboard, data["oldNo"]);
-
+      
+      //repairState(oldboard);
+      //checkState(oldboard, data["oldNo"]);
+      //stateAtIndex(true, true)([0, 1], [[0, 8, 2, 3],[3, 5, 7, 9],[12, 13, 14, 15],[21, 22, 23, 24]]);
+      //eachSlot(function(index, jquery, _){console.log(jquery)}, "hlep");
       eachMove(clearmoves, preRename);
       eachMove(clearmoves, moveTile(newboard));
       eachMove(mergemoves, moveTile(newboard));
