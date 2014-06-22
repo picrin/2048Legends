@@ -39,13 +39,19 @@ def all_empty(board):
                 allempty.append((x, y))
     return allempty
 
-def count_non_empty(board):
-    non_empty = 0
-    for x, lista in enumerate(board):
-        for y, elem in enumerate(lista):
-            if elem != 0:
-                non_empty += 1
-    return non_empty
+#def count_non_empty(board):
+#    non_empty = 0
+#    for x, lista in enumerate(board):
+#        for y, elem in enumerate(lista):
+#            if elem != 0:
+#                non_empty += 1
+#    return non_empty
+
+def generate_moves(moves):
+    for x in moves:
+        for y in moves[x]:
+            yield x, y
+
 
 def next_board(board, updown, downright):
     clear_moves = {}
@@ -69,6 +75,8 @@ def next_board(board, updown, downright):
                     merge_possible = True
                     report_to = clear_moves
                 previous_value = value
+                #that could be perhaps modified to include logic for
+                #static_moves as well.
                 if move_by != 0:
                     nc = new_coordinate(row, col, move_by, updown, downright)
                     for moves in [report_to, all_moves]:
@@ -78,6 +86,8 @@ def next_board(board, updown, downright):
 
     newboard = [[element for element in row] for row in board]
     resolve_moves(board, newboard, all_moves)
+    all_fields  = ((x, y) for x in range(size) for y in range(size))
+    static_moves = [(x, y) for (x, y) in all_fields if (x, y) not in generate_moves(all_moves) and board[x][y] != 0]
     
     allempty = all_empty(newboard)
     newpos = None
@@ -96,19 +106,17 @@ def next_board(board, updown, downright):
     results = {"oldboard": board,
             "clear_moves": clear_moves,
             "merge_moves": merge_moves,
+            "static_moves": static_moves,
             "newpos": newpos,
-            "oldNo": count_non_empty(board),
-            "newNo": count_non_empty(newboard),
             "newboard": newboard,
             "gameon": True,
             }
-    print "-"*30, "begin move", "-"*30
-    print "previous board"
-    pretty_board(board)
-    print board
-    print results
-    print "newboard"
-    pretty_board(newboard)
+    #print "-"*30, "begin move", "-"*30
+    #print "previous board"
+    #pretty_board(board)
+    #print results
+    #pretty_board(newboard)
+    
     #Speaking of moves, we return row number first, later column number.
     #This might seem strange, but it's natural once you
     #look at our representation: we have 4 small tables

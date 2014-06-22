@@ -27,6 +27,14 @@ def get_board(request):
     resp["gameid"] = 107
     return HttpResponse(simplejson.dumps(resp), mimetype='application/json')    
 
+#def test(request):
+#    board = [[1, 0, 1, 3], [0, 1, 2, 3], [0, 0, 1, 2], [2, 0, 3 ,0]]
+#    move_logic.pretty_board(board)
+#    result = move_logic.next_board(board, True, False)
+#    move_logic.pretty_board(result["newboard"])
+#    return HttpResponse(simplejson.dumps(result), mimetype='application/json')
+
+
 def nextmove(request):
     global board
     direction = request.POST["direction"]
