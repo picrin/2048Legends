@@ -1,0 +1,5 @@
+test that HMACs don't overflow, or use a better primitive (256-bit truncated sha512 or hmac-sha256(sha256(x), y).
+make sure that user creation checks e-mail and CAPTHA.
+make sure you have 2 types of sessionID cookies -- one for HTTPOnly (and secure, etc.) and one for ajax. Do not use ajax one for anything serious (more like js-intensive operations).
+give a thought to creating a good, practical crypto library, cause most cryptographers are excellent mathematicians, but dumb engineers, and most programmers are excellent engineers but dumb mathematicians. So, our good crypto library would have a fast hash function...
+make sure that all user input is properly escaped.

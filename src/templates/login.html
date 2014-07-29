@@ -1,0 +1,32 @@
+<!-- Copyright (c) Adam Kurkiewicz 2014, all rights reserved. -->
+{% extends "base.html" %}
+
+{% block header %}
+
+{% endblock %} <!-- header -->
+
+{% block body %}
+  <form name="input">
+  Username: <input type="text" value="" id="username" name="_0">
+  Password: <input type="password" value="" id="password" name="_1">
+  <input type="button" id="submit" value="Submit">
+  </form>
+    <button type="button" id="negotiate">negotiate</button>
+  <!-- scripts -->
+    <script
+      type="text/javascript"
+      src='https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/sha256.js'>
+    </script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/hmac-sha256.js">
+    </script>
+    <script
+      type="text/javascript"
+      src='https://cdnjs.cloudflare.com/ajax/libs/bignumber.js/1.4.1/bignumber.min.js'>
+    </script>
+  <script src="static/csrf.js"></script>
+  <script src="static/scrypt/scrypt.js"></script>
+  <script src="static/scrypt.js"></script>
+ {% endblock %} <!-- body -->
+

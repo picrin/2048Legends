@@ -5,22 +5,20 @@
 //after the competition. Currently it is shared for review purpose only.
 
 
-//------------------------- GLOBAL NUMERICAL CONSTANTS -------------------------
+//------------------------------ GLOBAL CONSTANTS ------------------------------
 var boardSize = 4;
 var gapSize = 10; //currently in pxs, might migrate to something more reasonable
 var tileSize = 80 + gapSize; // vide supra
 var quick = 160; //ms
 
-//We will keep jquery with references to DOM elements storing tiles in here.
+//We will keep jquery with references to DOM elements representing tiles in a
+//4x4 array.
 var DOMBoard = createBoard();
 
-
-//------------------------------- DIV CONSTANTS -------------------------------
-//global constants of divs we'll be appending to and removing from.
-
-//id of div to keep tiles inside, most of work will be done on this div.
+//the divs we'll be appending to and removing from.
+//id of the div to keep tiles in, most of work will be done on this div.
 var tiles = "#tiles";
-//id of div to keep slots inside
+//id of the div to keep slots in, i.e. squares which remain a static background 
 var slots = "#tile-placeholders";
 
 
@@ -44,7 +42,9 @@ var slot_template = '\
 //wee template for pxs.
 var valuepx = "{{value}}px";
 
-//GENERAL BOARD MANIPULATION
+
+//---------------------- BOARD CREATION AND MANIPULATION ----------------------
+
 function createBoard(){
   board = [];
   for(var i = 0; i < boardSize; i++){
@@ -58,28 +58,14 @@ function createBoard(){
   return board;
 }
 
+function _copyBoardAt(oldBoard, newBoard, index, newIndex){
+  newBoard[newIndex[0]][newIndex[1]] = oldBoard[index[0]][index[1]];
+}
+
 function boardCopier(oldBoard, newBoard){
   return function(from, to){
-    copyBoardAt(oldBoard, newBoard, from, to);
+    _copyBoardAt(oldBoard, newBoard, from, to);
   }
-}
-
-function updateHTML(_, index){
-  var tile = DOMBoard[index[0]][index[1]];
-  var value = tile.html();
-  return setTimeout(function(){tile.html(value * 2)}, quick);
-}
-
-function checkState(repair, warn){
-  for(var i = 0; i++; i < boardSize){
-    for(var ii = 0; ii++; ii < boardSize){
-      console.log(DOMBoard[i][ii]);
-    }
-  }
-}
-
-function copyBoardAt(oldBoard, newBoard, index, newIndex){
-  newBoard[newIndex[0]][newIndex[1]] = oldBoard[index[0]][index[1]];
 }
 
 
@@ -91,9 +77,8 @@ function coordinate(index){
 }
 
 //this is a pure function. Creates HTML nicely styled with css, which can be
-//furhter worked on or appended to the appropriate div. Notice how properties
-//left, top and id are in fact treated as variables, as they keep the state of
-//the program. 
+//furhter worked on or appended to the appropriate div. Notice how the
+//properties left and top are in fact treated as variables, as they keep state.
 function createTileHTML(rowNo, colNo, value){
   var values = {
     value: value,
@@ -111,7 +96,6 @@ function eachMove(moves, func){
   $.each(moves, function(row_i, rows){
     $.each(rows, function(col_i, newpos){
       func([row_i, col_i], newpos);
-      //console.log("func([", row_i, ", ", col_i, "], ", newpos, ")");
     });
   });
 }
@@ -123,9 +107,10 @@ function eachStatic(staticMoves, func){
 }
 
 
-//------------------------------ LAYOUT FUNCTIONS ------------------------------
+//------------------------------ DOM MANIPULATION ------------------------------
 //These two functions modify appropriate DOM elements adding html and css
 //to make a game board from it (with slots and tiles and shit).
+
 function prepareSlots(){
   $(slots).empty();
   for (var i = 0; i < boardSize; i++){
@@ -158,16 +143,8 @@ function appendTile(x, y, value){
   $(tiles).append(tile);
   DOMBoard[x][y] = tile;
   return tile
-  //console.log(window.board);
 }
 
-function animateAppear(jq){
-  jq.hide();
-  return setTimeout(function(){jq.show()}, quick);
-}
-
-
-//----------------------------- ON-CLICK MACHINERY -----------------------------
 function ifDetach(jq, bool){
   if(bool){
     return function(){
@@ -189,6 +166,20 @@ function detachAll(){
   }
 }
 
+
+//--------------------------------- ANIMATIONS ---------------------------------
+
+function animateAppear(jq){
+  jq.hide();
+  return setTimeout(function(){jq.show()}, quick);
+}
+
+function updateHTML(_, index){
+  var tile = DOMBoard[index[0]][index[1]];
+  var value = tile.html();
+  return setTimeout(function(){tile.html(value * 2)}, quick);
+}
+
 function animate(board, remove){
   for(var i = 0; i < boardSize; i++){
     for(var ii = 0; ii < boardSize; ii++){
@@ -202,7 +193,9 @@ function animate(board, remove){
   }
 }
 
+
 //----------------------- NETWORK/ KEYBOARD IO FUNCTIONS -----------------------
+
 function nextMove(directioncode, url){
   var board_data = null;
   $.ajax({
@@ -280,7 +273,6 @@ $(document).keydown(function(key){
     
     var newpos = data["newpos"];
     var oldBoard = data["oldboard"];
-    var newBoard = data["newboard"];
     
     detachAll();
     appendTiles(oldBoard);
@@ -303,12 +295,10 @@ $(document).keydown(function(key){
 
     eachMove(mergeMoves, copierTemp);
     eachMove(mergeMoves, updateHTML);
-    //checkState(true, true)
 
     animate(newTempBoard, true);
     animate(newPersistBoard, false);
 
-    //checkState(newboard, newNo);*/
   }
 });
 

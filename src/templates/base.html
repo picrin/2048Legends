@@ -1,18 +1,29 @@
+<!-- Copyright (c) Adam Kurkiewicz 2014, all rights reserved. -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <title>2048 World Champs</title>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js">
+    </script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.js">
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
+    <script
+      type="text/javascript"
+      src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap.min.js'>
+    </script>
+
+
     
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js"></script>
-    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    <script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js'></script>    
-
     {% block head %}
     {% endblock %}
-
-
   </head>
 
   <body>
@@ -29,7 +40,6 @@
           <a class="navbar-brand" href="#">Prize pool: 20,348$</a>
 
         </div>
-
         
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -40,14 +50,23 @@
             <li><a href="#">About</a></li>
 
           </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">popantrop</a></li>
-
+          <ul class="nav navbar-nav navbar-right" id="auth">
+            {% if authenticated %}
+              <li><a href="user/{{username}}">{{username}}</a></li>
+              <li><a href="signout">sign out</a></li>
+            {% else %}
+              <li><a href="register">register</a></li>
+              <li><a href="login">sign in</a></li>
+            {% endif %}
           </ul>
-
+          
         </div><!-- /.navbar-collapse -->
       </div>
     </nav>
+   <!-- a csrf token to prevent clickjacking -->
+  <div class="invisible">
+    {% csrf_token %}
+  </div>
       {% block body %}
       {% endblock %}      
   </body>

@@ -21,12 +21,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 DEBUG = True
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'pz_se&5271jw__!(*++-hwg%v*l4(^x$2iuqm2y9^&+1^b6dfhd'
+SECRET_KEY = '1337'
 
 if not DEBUG:
-    with open("/dev/random", 'rb') as f:
-        SECRET_KEY = str(f.read(256))
-
+    with open("/dev/urandom", 'rb') as f:
+        SECRET_KEY = binascii.hexlify(f.read(32))
 
 TEMPLATE_DEBUG = True
 
@@ -44,8 +43,12 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'website'
 )
+
+if DEBUG:
+    INSTALLED_APPS += ('django.contrib.staticfiles',)
+
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -65,17 +68,18 @@ WSGI_APPLICATION = 'WC2048.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#    }
-#}
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-uk'
 
 TIME_ZONE = 'UTC'
 
@@ -88,16 +92,24 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
+if DEBUG:
+    import os
+    STATIC_ROOT = 'staticfiles'
+    STATIC_URL = '/static/'
 
-import os
-STATIC_ROOT = 'staticfiles'
-STATIC_URL = '/static/'
+    STATICFILES_DIRS = (
+        os.path.join(BASE_DIR, 'static'),
+    )
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
+    STATICFILES_FINDERS = (
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    )
 
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-)
+from django.contrib import admin
+
+from django.db.models import get_models, get_app
+
+for model in get_models(get_app('website')):
+    admin.site.register(model)
+
