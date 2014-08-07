@@ -27,19 +27,6 @@
   line-height: 80px;
 }
 
-/*.moving{
-  -webkit-animation: moveright 200ms;
-  -webkit-animation-fill-mode: forwards;
-  -webkit-animation-timing-function: ease-in;
-}
-
-@-webkit-keyframes moveright
-{
-  from{left: 10px;}  
-  to {left: 70px;}
-}
-*/
-
 .table{
   margin-left: 100px;
 }

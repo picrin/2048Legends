@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseServerError, HttpResponseForbidden
 from django.utils import simplejson
-from models import Person, Tokena, RandomNegotiation
+from models import Person, Tokena, Game, Move
 import move_logic
 import datetime
 import hmac
@@ -14,8 +14,28 @@ import re
 import json
 
 board = None
+def processToRender(request, *args, **kwargs):
+    """
+    get_user__response = get_user(request)
+    print dir(get_user__response)
+    templateData = {}
+    if get_user__response.status_code == 200:
+        templateData["authenticated"] = True
+    else:
+        templateData["authenticated"] = False
+    templateData["username"] = get_user__response.content
+    """
+    pass
 def index(request):
-    return render(request, 'main.html', {"authenticated":True, "username":"adam"})
+    get_user__response = get_user(request)
+    print dir(get_user__response)
+    templateData = {}
+    if get_user__response.status_code == 200:
+        templateData["authenticated"] = True
+    else:
+        templateData["authenticated"] = False
+    templateData["username"] = get_user__response.content
+    return render(request, 'main.html', templateData)
 
 def play(request):
     global board
@@ -24,7 +44,6 @@ def play(request):
 def get_board(request):
     global board
     uid = request.GET["userid"]
-    print uid
     if board == None:
         board = move_logic.create_board(move_logic.size)
         board[2][2] = 2
@@ -37,7 +56,7 @@ def login(request):
     return render(request, "login.html")
 
 def logout(request):
-    response = HttpResponse(status=200)
+    response = render(request, 'main.html')
     response.delete_cookie('tokena')
     return response
     
@@ -53,21 +72,22 @@ def magic(request):
     print k2
     return HttpResponse("nice", RequestContext(request))
 
-def get_user(request):
+def get_user(request, just_username = False):
     cookie = request.COOKIES.get('tokena', False)
     if not cookie:
         return HttpResponse("not logged in/ invalid token.", status=404)
     token = Tokena.objects
-    token.filter(value=cookie)
+    token = token.filter(value=cookie)
     token = token.filter(active=True)
     if token:
         right_token = token[0]
+        print "-"*80
+        print len(token)
+        print right_token.belongs_to.login
         return HttpResponse(right_token.belongs_to.login, RequestContext(request), status=200)
 
-#def magic(request):
-#    pass
-
 from ipware.ip import get_ip
+
 #this returns 256 bits of pseudo-randomness in form of 512 bits of data.
 def rand256hex():
     with open("/dev/urandom", 'rb') as f:
@@ -78,7 +98,6 @@ def hmachash(hashme, salt):
     return hmaccer.hexdigest()
 
 def negotiate_first(request):
-    #serverSecretHashed aka ID
     clientSecretHashed = str(request.POST["clientSecretHashed"])
     serverSecret = rand256hex()
     hasher = hashlib.sha256()
@@ -92,7 +111,8 @@ def negotiate_first(request):
             clientSecretHashed = clientSecretHashed
             )
     negotiation.save()
-    return HttpResponse(json.dumps({"serverSecretHashed": serverSecretHashed}), content_type='application/json')
+    return serverSecretHashed
+    #return HttpResponse(json.dumps({"serverSecretHashed": }), content_type='application/json')
 
 def negotiate_second(request):
     clientSecret = str(request.POST["clientSecret"])
@@ -107,9 +127,8 @@ def negotiate_second(request):
         secret = record.serverSecret
         return HttpResponse(json.dumps({"serverSecret": secret}), content_type='application/json')
     else:
-        return HttpResponseForbidden("nice try")
+        return HttpResponseForbidden("Pacta sunt servanda")
     
-
 def authenticate(request):
     #ip = get_ip(request)
     username = str(request.POST["username"])
@@ -128,7 +147,6 @@ def authenticate(request):
             expected = userrecord.hashedPassword
             print "observed:", observed
             print "expected:", expected
-            #create Token
             if observed != expected:
                 return badluck
             else:
@@ -136,7 +154,7 @@ def authenticate(request):
                 token = Tokena(value = randombytes, active = True, belongs_to = userrecord, created=datetime.datetime.utcnow())
                 token.save()
                 response = HttpResponse(status = 200)
-                response.set_cookie("tokena", value=randombytes, httponly=False)
+                response.set_cookie("tokena", value=randombytes, httponly=True)
                 return response
         else:
             return HttpResponseServerError("couldn't authenticate the user, username non-ambiguous.")
@@ -158,25 +176,13 @@ def create_user(request):
         hashedpass = hmachash(password,salt)
         newPerson=Person(login = username, hashedPassword = hashedpass, salt=salt)
         newPerson.save()
-        return HttpResponse(200);
+        return HttpResponse(status = 200);
     else:
         return HttpResponseForbidden("username already exists")
 
 def signin(request):
     return authenticate(request)
-    #print pbkdf2.PBKDF2.crypt("hashpass", "usersalt", 10000)
-    #if plainpass:
-        #if not user allows plainpass:
-        #    return plainpass is not allowed.
-        #grab salt[username] from database
-        #concat username + salt + password, and key-stretch hash
-        #if not hash matches
-        #    return wrong credentials
-        #else
-        #    generate a http-only cookie and pass it to the user, and set it to be valid for 60 minutes and reset it every
-        #         time html requests are done.
-        #pass
-    
+
 def signup(request):
     return create_user(request)
 
@@ -188,23 +194,29 @@ def signup(request):
 #ontent='', content_type=None, status=200, reason=None
 #    return HttpResponse(simplejson.dumps(result), content_type='application/json')
 
-
+def register(request):
+    return render(request, "register.html")
 
 def nextmove(request):
     global board
+    print board
     direction = request.POST["direction"]
-    if direction == u'1':
+    if direction == "right":
         booleans = (False, True)
-    elif direction == u'2':
-        booleans = (True, True)        
-    elif direction == u'0':
-        booleans = (True, False)        
-    elif direction == u'3':
-        booleans = (False, False)        
+    elif direction == "down":
+        booleans = (True, True)
+    elif direction == "up":
+        booleans = (True, False)
+    elif direction == "left":
+        booleans = (False, False)
     else:
         raise Http404
     full_board = move_logic.next_board(board, *booleans)
+    #print full_board
     board = full_board["newboard"]
-    return HttpResponse(simplejson.dumps(full_board),
+    
+    serverSecretHashed = negotiate_first(request)
+    full_board["serverSecretHashed"] = serverSecretHashed;
+    return HttpResponse(json.dumps(full_board),
                         content_type='application/json')
 

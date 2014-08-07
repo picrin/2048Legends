@@ -10,9 +10,10 @@ urlpatterns = patterns('',
     url(r'^get_board$', views.get_board),
     url(r'^login$', views.login),
     url(r'^signin$', views.signin),
-    url(r'^magic$', views.magic),
     url(r'^signup$', views.signup),
     url(r'^get_user', views.get_user),
     url(r'^negotiate_first', views.negotiate_first),
-    url(r'^negotiate_second', views.negotiate_second)
+    url(r'^negotiate_second', views.negotiate_second),
+    url(r'^register', views.register),
+    url(r'^signout', views.logout)
 )

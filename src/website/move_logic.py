@@ -90,11 +90,12 @@ def next_board(board, updown, downright):
     static_moves = [(x, y) for (x, y) in all_fields if (x, y) not in generate_moves(all_moves) and board[x][y] != 0]
     
     allempty = all_empty(newboard)
+    print allempty
     newpos = None
     if len(all_moves) != 0 and len(allempty) != 0:
-            #TODO extract method
-            newpos = allempty[int(os.urandom(1).encode("hex"), 16)%len(allempty)]
-            newboard[newpos[0]][newpos[1]] = 2
+        #TODO extract method
+        newpos = allempty[int(os.urandom(1).encode("hex"), 16)%len(allempty)]
+        newboard[newpos[0]][newpos[1]] = 2
 
     else:
         #TODO finish the pseudocode
@@ -103,20 +104,17 @@ def next_board(board, updown, downright):
         #else:
         #    pass
         pass
-    results = {"oldboard": board,
+    results = {
+            "oldboard": board,
             "clear_moves": clear_moves,
             "merge_moves": merge_moves,
+            "all_empty" : allempty,
             "static_moves": static_moves,
             "newpos": newpos,
             "newboard": newboard,
             "gameon": True,
             }
-    #print "-"*30, "begin move", "-"*30
-    #print "previous board"
-    #pretty_board(board)
-    #print results
-    #pretty_board(newboard)
-    
+
     #Speaking of moves, we return row number first, later column number.
     #This might seem strange, but it's natural once you
     #look at our representation: we have 4 small tables

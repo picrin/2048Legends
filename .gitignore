@@ -3,3 +3,4 @@ activate
 *.pyc
 venv
 db.sqlite3
+.c9

@@ -2,8 +2,6 @@
 {% extends "base.html" %}
 
 {% block head %}
-    <link href="static/play.css" rel="stylesheet" type="text/css">
-    <link href="static/templates.html" rel="import" type="text/html">
 {% endblock %}
 
 {% block body %}
@@ -12,17 +10,18 @@
     {% csrf_token %}
   </div>
 
-    <div class="gameboard">
-      <!-- We're going to programmaticly append tiles and tile slots as children of the divs below. -->
-      <div id="tile-placeholders"></div>
-      <div id="tiles"></div>
-      <div id="garbage"></div>
-    </div>
-
-    <!-- script with all animations, etc. -->
-    <script src="static/csrf.js"></script>
-    <script src="static/play.js"></script>
-
+  <div class="gameboard">
+    <!-- We're going to programmaticly append tiles and tile slots as children of the divs below. -->
+    <div id="tile-placeholders"></div>
+    <div id="tiles"></div>
+    <div id="garbage"></div>
+  </div>
 
 {% endblock %}
 
+{% block scripts %}
+  <link href="static/css/play.css" rel="stylesheet" type="text/css">
+  <script src="static/js/play.js" type="application/javascript"></script>
+
+
+{% endblock%}
