@@ -3,31 +3,30 @@
   {% block head %}
     <link rel="stylesheet" href="/static/css/style.css">
   {% endblock %}
-      {% block body %}
-        <div class="container-fluid width-medium pos-center">
-          <div class="panel panel-default">
-            <div class="panel-heading panel-fluid">
-              <h1 class="panel-title large-lead text-center">2048 World Championships.</h1>
-            </div>
-            <div class="panel-body">
-              <ol class="simple-list">
-                <li class="lead">
-                  Chip in 2$ to the prize pool.
-                </li>
-                <li class="lead">
-                  Play 3 games of 2048.
-                </li>
-                <li class="lead">
-                  If you achieve the highest score, you get 50% of the money in
-                  the prize pool and earn a place in the hall of fame on our leaderboard!
-                </li>
-              </ol>
-            </div>
-          </div>
-          <div class="container-fluid text-center">
-          <div class="btn-group">
-            <button type="button" class="btn-success btn-lg ">Play to win!</button>
-            <button type="button" class="btn-primary btn-lg">Play to practise!</button>
+  {% block body %}
+    <div class="container-fluid width-medium pos-center">
+      <div class="panel panel-default">
+        <div class="panel-heading panel-fluid">
+          <h1 class="panel-title large-lead text-center">2048 World Championships.</h1>
         </div>
-      {% endblock %}      
+        <div class="panel-body">
+          <ol class="simple-list">
+            <li class="lead">
+              Chip in 2$ to the prize pool.
+            </li>
+            <li class="lead">
+              Play 3 games of 2048.
+            </li>
+            <li class="lead">
+              If you achieve the highest score, you get 50% of the money in
+              the prize pool and earn a place in the hall of fame on our leaderboard!
+            </li>
+          </ol>
+        </div>
+      </div>
+      <form action="play" method="get">
+        <input type="submit" value="Play for free!" class="btn-success btn-lg" style="width:100%">
+      </form>
+    </div>
+  {% endblock %}      
 

@@ -215,8 +215,8 @@ def nextmove(request):
     #print full_board
     board = full_board["newboard"]
     
-    serverSecretHashed = negotiate_first(request)
-    full_board["serverSecretHashed"] = serverSecretHashed;
+    #serverSecretHashed = negotiate_first(request)
+    #full_board["serverSecretHashed"] = serverSecretHashed;
     return HttpResponse(json.dumps(full_board),
                         content_type='application/json')
 

@@ -2,15 +2,14 @@
   background-color: #99AABD;
   position: relative;
   border-radius: 7px;
-  width: 370px;
-  height: 370px;
+  width: 98%;
+  max-width:370px;
+  height:370px;
 }
 
 .tile, .tile-placeholder{
   position: absolute;
   border-radius: 5px;
-  width: 80px;
-  height: 80px;
 }
 
 
@@ -27,6 +26,3 @@
   line-height: 80px;
 }
 
-.table{
-  margin-left: 100px;
-}

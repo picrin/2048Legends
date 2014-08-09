@@ -20,15 +20,16 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
   //-------------------------------- CONSTANTS --------------------------------
   
   n.boardSize = 4;
-  n.gapSize = 10; //currently in pxs, might migrate to something more reasonable
-  n.tileSize = 80 + n.gapSize; // vide supra
+  n.tileToGapRatio = 8; // The ratio of one tile to one gap between two tiles.
   n.quick = 160; //ms
+  n.unitsNo = (n.tileToGapRatio + 1) * n.boardSize + 1
   
-  //the divs we'll be appending to and removing from.
+  //the divs we'll be appending to, working with and removing from.
   //id of the div to keep tiles in, most of work will be done on n div.
   n.tiles = "#tiles";
   //id of the div to keep slots in, i.e. squares which remain a static background 
   n.slots = "#tile-placeholders";
+  n.gameboard = "#gameboard";
   
   
   //-------------------------------- TEMPLATES --------------------------------
@@ -37,14 +38,14 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
   
   //Template for tiles
   n.tile_template ='\
-  <div class="tile" style="left: {{leftpx}}px; top: {{toppx}}px;">\
+  <div class="tile" style="left: {{leftpx}}px; top: {{toppx}}px; width: {{widthpx}}px; height: {{heightpx}}px">\
     {{value}}\
   </div>\
   ';
   
   //Template for slots
   n.slot_template = '\
-  <div class="tile-placeholder" style="left: {{leftpx}}px; top: {{toppx}}px;">\
+  <div class="tile-placeholder" style="left: {{leftpx}}px; top: {{toppx}}px; width: {{widthpx}}px; height: {{heightpx}}px">\
   </div>\
   ';
   
@@ -83,10 +84,25 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
   
   
   //----------------------------- HELPER FUNCTIONS -----------------------------
-  //this computes a relative coordinate in units (px, but I might migrate to
-  //something more flexible).
+  
+  //this returns current width of gameboard
+  n.width = function(){
+    return $("#gameboard").width();
+  };
+  
+  //this computes the size of one unit -- aka space in pxs between 2 nearest tiles.
+  n.unitSize = function(){
+    return n.width()/n.unitsNo;
+  };
+  
+  //this computes a relative coordinate in pxs.
   n.coordinate = function(index){
-    return n.tileSize * index + n.gapSize;
+    return n.unitSize() * ((n.tileToGapRatio + 1) * index + 1);
+  };
+  
+  //this computes the size of the tile.
+  n.tileSize = function(){
+    return n.unitSize()*n.tileToGapRatio;
   };
   
   //this is a pure function. Creates HTML nicely styled with css, which can be
@@ -97,6 +113,8 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
       value: value,
       leftpx: n.coordinate(colNo),
       toppx: n.coordinate(rowNo),
+      widthpx: n.tileSize(),
+      heightpx: n.tileSize(),
       rowNo: rowNo,
       colNo: colNo,
     };
@@ -131,6 +149,8 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
           var values = {
             leftpx: n.coordinate(i),
             toppx: n.coordinate(ii),
+            widthpx: n.tileSize(),
+            heightpx: n.tileSize()
           };
           var slot_html = window.Mustache.render(n.slot_template, values);
           $(n.slots).append(slot_html);
@@ -168,17 +188,6 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
     }
   };
   
-  n.detachAll = function(){
-    for(var i; i < n.boardSize; i++){
-      for(var ii; ii < n.boardSize; ii++){
-        var tile = n.DOMBoard[i][ii];
-        if (tile !== null){
-          tile.detach();
-        }
-      }
-    }
-  };
-  
   
   //-------------------------------- ANIMATIONS --------------------------------
   
@@ -201,6 +210,21 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
           var leftpx = window.Mustache.render(n.valuepx, {value: n.coordinate(i)});
           var toppx = window.Mustache.render(n.valuepx, {value: n.coordinate(ii)});
           tile.animate({top: leftpx, left: toppx}, n.quick, n.ifDetach(tile, remove));
+        }
+      }
+    }
+  };
+  
+  n.resizeTiles = function(){
+    for(var i = 0; i < n.boardSize; i++){
+      for(var ii = 0; ii < n.boardSize; ii++){
+        var tile = n.DOMBoard[i][ii];
+        if (tile !== null){
+          console.log(n.tileSize() + "px")
+          tile.css("left", n.coordinate(ii) + "px");
+          tile.css("top", n.coordinate(i) + "px");
+          tile.css("height", n.tileSize() + "px");
+          tile.css("width", n.tileSize() + "px");
         }
       }
     }
@@ -274,6 +298,14 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
     n.appendTiles(board);
   };
   
+  n.onResize = function() {
+    var gameboard = $("#gameboard");
+    var gameboardWidth = gameboard.width();
+    gameboard.css({'height':gameboardWidth+'px'});
+    n.prepareSlots();
+    n.resizeTiles();
+  };
+  
   //Client commits to a random number by sending a hex-encoded sha256 hash of
   //that number. Server in turn commits to its number choice. 
   n.clientCommitment = function(direction, commitment){
@@ -282,7 +314,7 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
       
       var oldBoard = data["oldboard"];
       
-      n.detachAll();
+      $(n.tiles).empty();
       n.appendTiles(oldBoard);
       
       var mergeMoves = data["merge_moves"];

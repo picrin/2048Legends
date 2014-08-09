@@ -4,7 +4,7 @@
 //prohibited. This code is expected to be released under permissive licence
 //after the competition. Currently it is shared for review purpose only.
 
-$(document).ready(function(){
+$(window).load(function(){
   window.Csrf2048wc.setupCSRF();
   var userid = 1029123;
   window.Play2048wc.DOMready(userid);
@@ -18,3 +18,4 @@ $(document).keydown(function(key){
 });
 
 
+$( window ).resize(window.Play2048wc.onResize);
