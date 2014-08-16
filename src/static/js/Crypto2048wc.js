@@ -9,22 +9,25 @@
 window.tZKN5DLe6lyf8Fjx8gb3AKqb8gXkxd7EqMTnAV3Vj26RL = function(n){ 
   n.scrypt = window.scrypt_module_factory();
   n.salt = "2048wc.com says: Nic dwa razy sie nie zdarza i nie zdarzy. Z tej przyczyny zrodzilismy sie bez wprawy i pomrzemy bez rutyny.";
-  n.N = 16384;
+  n.N = 16384;//WARNING -- this value of N parameter will crash firefox with DEV-TOOLS open. It won't crash it without dev-tools.
+  //n.N = 2048; If evidence is presented that number above is too large, use a uncomment this.
   n.r = 8;
   n.p = 1;
   
-  //TODO this is wrong, you need to be more careful about trailing zeros!
-  n.nextRandomShit = function(){
+  n.nextRandom = function(){
     var array = new Uint32Array(8);
     window.crypto.getRandomValues(array);
-    var hex = "";
+
+    var hexString = "";
+    var hex;
     for (var i = 0; i < array.length; i++) {
-      hex += array[i].toString(16);
+      hex = array[i].toString(16);
+      hex = (Math.pow(10, (8 - hex.length)) + "").substring(1, 9) + hex;
+      hexString += hex; 
     }
-    return hex;
+    return hexString;
   };
 
-  
   
   n.stretch_key = function(key, salt, N, r, p){
   	var hash = n.scrypt.crypto_scrypt(
@@ -40,7 +43,7 @@ window.tZKN5DLe6lyf8Fjx8gb3AKqb8gXkxd7EqMTnAV3Vj26RL = function(n){
     return n.stretch_key(combUsrPass, n.salt, n.N, n.r, n.p);
   };
   
-  n.nextRandom = function(){
+  n.nextRandomLegacy = function(){
     var nextRandomStore = window.CryptoJS.HmacSHA256(
         localStorage.getItem("secretSeed"),
         localStorage.getItem("nextRandom")
@@ -121,7 +124,7 @@ window.tZKN5DLe6lyf8Fjx8gb3AKqb8gXkxd7EqMTnAV3Vj26RL = function(n){
       url: "signin",
       data: {username: username, password: sharedSecret},
       async: true,
-      success: function(_){location.reload()}
+      success: function(_){location.replace("/")}
     });
     //console.log(localStorage.getItem("nextRandom"))
     //console.log(CryptoJS.SHA256("gugugu")["words"][0])

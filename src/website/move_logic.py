@@ -1,5 +1,6 @@
 #Copyright (c) Adam Kurkiewicz 2014, all rights reserved.
 import os
+import json
 size = 4
 def create_board(size):
     return [[0 for i in range(size)] for ii in range(size)]
@@ -52,6 +53,11 @@ def generate_moves(moves):
         for y in moves[x]:
             yield x, y
 
+def serialize_board(board):
+    return json.dumps(board)
+    
+def deserialize_board(board_string):
+    return json.loads(board_string)
 
 def next_board(board, updown, downright):
     clear_moves = {}
@@ -90,27 +96,26 @@ def next_board(board, updown, downright):
     static_moves = [(x, y) for (x, y) in all_fields if (x, y) not in generate_moves(all_moves) and board[x][y] != 0]
     
     allempty = all_empty(newboard)
-    print allempty
-    newpos = None
-    if len(all_moves) != 0 and len(allempty) != 0:
-        #TODO extract method
-        newpos = allempty[int(os.urandom(1).encode("hex"), 16)%len(allempty)]
-        newboard[newpos[0]][newpos[1]] = 2
+    #if len(all_moves) != 0 and len(allempty) != 0:
 
-    else:
+    #newpos = None
+    #TODO extract method as second stage of the protocol
+    #    newpos = allempty[int(os.urandom(1).encode("hex"), 16)%len(allempty)]
+    #    newboard[newpos[0]][newpos[1]] = 2
+    
+    #else:
         #TODO finish the pseudocode
         #if not has_move(board):
         #    return gameon: False
         #else:
         #    pass
-        pass
+        
     results = {
             "oldboard": board,
             "clear_moves": clear_moves,
             "merge_moves": merge_moves,
             "all_empty" : allempty,
             "static_moves": static_moves,
-            "newpos": newpos,
             "newboard": newboard,
             "gameon": True,
             }

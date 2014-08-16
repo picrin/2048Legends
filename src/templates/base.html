@@ -4,12 +4,12 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <title>2048 World Champs</title>
-
+    <meta name="viewport" content="width=device-width, user-scalable=no">
     {% block head %}
     {% endblock %}
   </head>
 
-  <body>
+  <body id = "body">
     <!-- a csrf token to prevent clickjacking -->
     <div class="invisible">
       {% csrf_token %}
@@ -25,26 +25,25 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Prize pool: 20,348$</a>
+          <a class="navbar-brand" style="font-size:25px">Prize pool: 20,348$</a>
 
         </div>
         
         <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <div class="collapse navbar-collapse"  style="font-size:20px" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav navbar-left">
             <li><a href="play">Play</a></li>
             <li class="active"><a href="#">Buy games (3 left)</a></li>
             <li><a href="#">Leaderboard</a></li>
             <li><a href="#">About</a></li>
-
           </ul>
-          <ul class="nav navbar-nav navbar-right" id="auth">
+          <ul class="nav navbar-nav navbar-right">
             {% if authenticated %}
               <li><a href="user/{{username}}">{{username}}</a></li>
-              <li><a href="signout">sign out</a></li>
+              <li><a href="signout">Sign out</a></li>
             {% else %}
-              <li><a href="register">register</a></li>
-              <li><a href="login">sign in</a></li>
+              <li><a href="register">Register</a></li>
+              <li><a href="login">Sign in</a></li>
             {% endif %}
           </ul>
           
@@ -53,8 +52,7 @@
     </nav>
     {% block body %}
     {% endblock %}
-
-    <!-- TODO try to see if we can slim these down. Aim for no more then 500ms of loading -->
+    <!-- TODO try to see if we can slim these down. Aim for no more then 400ms of loading -->
     <script
       type="application/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.js">
@@ -66,8 +64,12 @@
       type="application/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap.min.js">
     </script>
-
+    
     <!-- TODO should need those only for play screen-->
+    <script
+      type="application/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.4/jquery.touchSwipe.js">
+    </script>
     <script
       type="application/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.js">

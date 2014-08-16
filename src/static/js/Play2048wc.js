@@ -87,7 +87,7 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
   
   //this returns current width of gameboard
   n.width = function(){
-    return $("#gameboard").width();
+    return $(n.gameboard).width();
   };
   
   //this computes the size of one unit -- aka space in pxs between 2 nearest tiles.
@@ -220,7 +220,6 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
       for(var ii = 0; ii < n.boardSize; ii++){
         var tile = n.DOMBoard[i][ii];
         if (tile !== null){
-          console.log(n.tileSize() + "px")
           tile.css("left", n.coordinate(ii) + "px");
           tile.css("top", n.coordinate(i) + "px");
           tile.css("height", n.tileSize() + "px");
@@ -233,33 +232,54 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
   
   //---------------------- NETWORK/ KEYBOARD IO FUNCTIONS ----------------------
   
-  n.nextMove = function(direction, clientCommitment){
-    var board_data = null;
+  n.commit = function(direction, clientCommitment){
     $.ajax({
       type: 'POST',
-      url: "nextmove",
-      data: {gameid: "12q345908762459876",
-             clientSecretHashed : clientCommitment,
+      url: 'exchangeCommitments',
+      data: {clientSecretHashed : clientCommitment,
              direction: direction},
-      async: false,
-      success: function(data){
-        board_data = data;
+      async: true,
+      statusCode:{
+        200: n.processServerCommitment,
+        452: n.reveal(true)
       }
     });
-    return board_data;
   };
-  
-  n.orderBoard = function(userid){
-    var board = null;
+
+  n.reveal = function(surrender, clientSecret){
+    var request = {
+      type: 'POST',
+      url: "exchangeSecrets",
+      data: {
+        surrender: surrender
+      },
+      async: true,
+      statusCode:{
+        200: n.processServerCommitment,
+        452: function(_){alert("out of order reveal request")}
+      }
+    };
+    if (surrender === true){
+      request.data.clientSecret = "X";
+      return function(_){
+        $.ajax(request);
+      };
+    }
+    else{
+      return function(clientSecret){
+        request.data.clientSecret = clientSecret;
+        $.ajax(request);
+      };
+    }
+  };
+  //Getting a 4x4 array from the server
+  n.orderBoard = function(){
     $.ajax({
       type: 'GET',
       url: 'get_board',
-      data: {userid: userid},
-      async: false,
-    }).done( function(data){
-      board = data["board"];
+      async: true,
+      success: n.prepareGame,
     });
-    return board;
   };
   
   //Copy-paste from SO, I do not own the copyright
@@ -288,30 +308,26 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
   
   //------------------------------ MAIN FUNCTIONS ------------------------------
   
-  n.DOMready = function(userid){
+  n.prepareGame = function(data){
     n.DOMBoard = n.createBoard();
     //purely visual, plots nice tile slots aka placeholders
     n.prepareSlots();
-    //getting a 4x4 array from server
-    var board = n.orderBoard(userid);
     //printing the tiles as obtained from the server
-    n.appendTiles(board);
+    n.appendTiles(data["board"]);
+    n.onResize();
   };
   
   n.onResize = function() {
     var gameboard = $("#gameboard");
     var gameboardWidth = gameboard.width();
-    gameboard.css({'height':gameboardWidth+'px'});
+    gameboard.css({'height': gameboardWidth + 'px'});
     n.prepareSlots();
     n.resizeTiles();
   };
   
-  //Client commits to a random number by sending a hex-encoded sha256 hash of
+  //Client commits to a random number by sending a hex-encoded sha256 of
   //that number. Server in turn commits to its number choice. 
-  n.clientCommitment = function(direction, commitment){
-      //data from request
-      var data = n.nextMove(direction, commitment);
-      
+  n.processServerCommitment = function(data){
       var oldBoard = data["oldboard"];
       
       $(n.tiles).empty();
@@ -337,15 +353,18 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
       
       n.animate(newTempBoard, true);
       n.animate(newPersistBoard, false);
-      var serverCommitment  = data["serverSecretHashed"];
-      return serverCommitment ;
+      //TODO use some sort of reactive programming or monad to get rid of it.
+      n.serverCommitment = data["serverSecretHashed"];
+      n.clientReveal(false, "mysecretsecret")();
   };
-  n.clientReveal = function(serverCommitment){
-    if (newpos !== null){
-      n.animateAppear(n.appendTile(newpos[0], newpos[1], 2));
-    }
+
+  n.processServerSecret = function(data){
+    //TODO check soundness
+    //if (newpos !== null){
+    //  n.animateAppear(n.appendTile(newpos[0], newpos[1], 2));
+    //}
   };
-  
+  //return object with methods attached.
   return n;
 };
 if (window.Play2048wc === undefined){

@@ -17,13 +17,12 @@ class Tokena(models.Model):
         return str(self.value)
 
 class Game(models.Model):
-    belongs_to = models.ForeignKey(Person)
-    gameID     = models.CharField(max_length=64)
-    latestMove = models.ForeignKey('Move', null=True, blank=True)
+    belongs_to = models.ForeignKey(Person, null=True)
+    lastMove = models.ForeignKey('Move', null=True, blank=True)
+    gameover   = models.BooleanField()
 
 class Move(models.Model):
-    moveID             = models.CharField(max_length=64)
-    belongs_to         = models.ForeignKey(Game)
+    belongs_to         = models.ForeignKey('Game', null=True, blank=True)
     moveNumber         = models.BigIntegerField()
     board              = models.CharField(max_length=200)
     serverSecret       = models.CharField(max_length=64)
