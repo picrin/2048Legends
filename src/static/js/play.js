@@ -12,7 +12,8 @@ $(window).load(function(){
 
 var swipeOrKey = function(direction){
   //var serverCommitment = window.Play2048wc.clientCommitment(direction, );
-  window.Play2048wc.commit(direction, "16dc368a89b428b2485484313ba67a3912ca03f2b2b42429174a4f8b3dc84e44");
+  var r$h = window.Crypto2048wc.randomWithHash();
+  window.Play2048wc.negotiateMove(direction, r$h.random, r$h.randomHash);
 };
 
 $(document).keydown(function(key){

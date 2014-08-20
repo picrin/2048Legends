@@ -232,44 +232,128 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
   
   //---------------------- NETWORK/ KEYBOARD IO FUNCTIONS ----------------------
   
-  n.commit = function(direction, clientCommitment){
-    $.ajax({
-      type: 'POST',
-      url: 'exchangeCommitments',
-      data: {clientSecretHashed : clientCommitment,
-             direction: direction},
-      async: true,
-      statusCode:{
-        200: n.processServerCommitment,
-        452: n.reveal(true)
+  n.negotiateMove = function(direction, clientSecret, clientCommitment){
+    //these variables are here to keep state for eventual 
+    var serverCommitment;
+    var allempty;
+    
+    //Client commits to a random number by sending a hex-encoded sha256 of
+    //that number. Server in turn commits to its number choice. 
+    var commit = function(){
+      $.ajax({
+        type: 'POST',
+        url: 'exchangeCommitments',
+        data: {clientSecretHashed : clientCommitment,
+               direction: direction},
+        async: false,
+        statusCode:{
+          200: processServerCommitment,
+          452: reveal(true)
+        }
+      });
+    };
+    
+    var processServerCommitment = function(data){
+      var oldBoard = data["oldboard"];
+      
+      $(n.tiles).empty();
+      n.appendTiles(oldBoard);
+        
+      var mergeMoves = data["merge_moves"];
+      var clearMoves = data["clear_moves"];
+      var staticMoves = data["static_moves"];
+        
+      var newPersistBoard = n.createBoard();
+      var newTempBoard = n.createBoard();
+      
+      var copierPersist = n.boardCopier(n.DOMBoard, newPersistBoard);
+      var copierTemp = n.boardCopier(n.DOMBoard, newTempBoard);
+      
+      n.eachStatic(staticMoves, copierPersist);
+      n.eachMove(clearMoves, copierPersist);
+      
+      n.DOMBoard = newPersistBoard;
+      
+      n.eachMove(mergeMoves, copierTemp);
+      n.eachMove(mergeMoves, n.updateHTML);
+      
+      n.animate(newTempBoard, true);
+      n.animate(newPersistBoard, false);
+      //TODO use some sort of reactive programming or monad to get rid of it.
+      serverCommitment = data["serverSecretHashed"];
+      console.log(serverCommitment);
+      allempty = data["allempty"];
+      reveal(false)();
+    };
+    
+    var reveal = function(surrender){
+      var request = {
+        type: 'POST',
+        url: "exchangeSecrets",
+        data: {
+          surrender: surrender,
+          clientSecret: clientSecret
+        },
+        async: true,
+        statusCode:{
+          200: processServerSecret,
+          452: function(_){console.error("out of order secret exchange request")}
+        }
+      };
+      
+      if (surrender === true){
+        request.data.clientSecret = "X";
       }
-    });
-  };
-
-  n.reveal = function(surrender, clientSecret){
-    var request = {
-      type: 'POST',
-      url: "exchangeSecrets",
-      data: {
-        surrender: surrender
-      },
-      async: true,
-      statusCode:{
-        200: n.processServerCommitment,
-        452: function(_){alert("out of order reveal request")}
+      return function(secret){
+        $.ajax(request);
+      };
+    };
+    
+    var processServerSecret = function(data){
+      var serverSecret = data["serverSecret"];
+      var expectedServerCommitment = window.CryptoJS.SHA256(serverSecret).toString();
+      //TODO check and blame if correct all_empty.
+      if (expectedServerCommitment !== serverCommitment){
+        console.error("server Cheating");
+        console.error("expected:", expectedServerCommitment);
+        console.error("received:", serverCommitment);
+      }
+      //var serverSecretHashedNumber = ;
+      //varnum = serverSecretNumber.toString(16)
+      var xoredHex = [];
+      var len = serverSecret.length;
+      for(var i = 0; i < len; i++){
+        xoredHex[i] = (parseInt(serverSecret[i], 16) ^
+                       parseInt(clientSecret[i], 16)
+                       ).toString(16);
+      }
+      xoredHex = xoredHex.join("");
+      var serverXoredHex = data["randomNumber"];
+      //TODO check soundness
+      //if (newpos !== null){
+      //  n.animateAppear(n.appendTile(newpos[0], newpos[1], 2));
+      //}
+      //console.log("xored", xoredHex.join(""));
+      //console.log("sored", serverXoredHex);
+      n.checkAndBlame(xoredHex, serverXoredHex);
+      var position = window.BigNumber(xoredHex, 16);
+      position = allempty[position.mod(allempty.length).toNumber()];
+      n.checkAndBlame(position[0], data["position"][0]);
+      n.checkAndBlame(position[1], data["position"][1]);
+      //TODO there's a clever trick to be performed: use undefined instead of nulls (in case of a real empty space), and make nulls denote "real" empty spaces. Then everything should essentialy work, even if one moves the keys really quickly.
+      if(n.DOMBoard[position[0]][position[1]] === null){
+        n.appendTile(position[0], position[1], data["value"]);
       }
     };
-    if (surrender === true){
-      request.data.clientSecret = "X";
-      return function(_){
-        $.ajax(request);
-      };
-    }
-    else{
-      return function(clientSecret){
-        request.data.clientSecret = clientSecret;
-        $.ajax(request);
-      };
+    commit();
+  } /* negotiateMove */;
+  n.checkAndBlame = function(expected, received){
+    if(expected !== received){
+      console.error("server Cheating!");
+      console.error("expected:", expected);
+      console.error("received:", received);
+      n.expected = expected;
+      n.received = received;
     }
   };
   //Getting a 4x4 array from the server
@@ -323,46 +407,6 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
     gameboard.css({'height': gameboardWidth + 'px'});
     n.prepareSlots();
     n.resizeTiles();
-  };
-  
-  //Client commits to a random number by sending a hex-encoded sha256 of
-  //that number. Server in turn commits to its number choice. 
-  n.processServerCommitment = function(data){
-      var oldBoard = data["oldboard"];
-      
-      $(n.tiles).empty();
-      n.appendTiles(oldBoard);
-      
-      var mergeMoves = data["merge_moves"];
-      var clearMoves = data["clear_moves"];
-      var staticMoves = data["static_moves"];
-      
-      var newPersistBoard = n.createBoard();
-      var newTempBoard = n.createBoard();
-      
-      var copierPersist = n.boardCopier(n.DOMBoard, newPersistBoard);
-      var copierTemp = n.boardCopier(n.DOMBoard, newTempBoard);
-      
-      n.eachStatic(staticMoves, copierPersist);
-      n.eachMove(clearMoves, copierPersist);
-      
-      n.DOMBoard = newPersistBoard;
-      
-      n.eachMove(mergeMoves, copierTemp);
-      n.eachMove(mergeMoves, n.updateHTML);
-      
-      n.animate(newTempBoard, true);
-      n.animate(newPersistBoard, false);
-      //TODO use some sort of reactive programming or monad to get rid of it.
-      n.serverCommitment = data["serverSecretHashed"];
-      n.clientReveal(false, "mysecretsecret")();
-  };
-
-  n.processServerSecret = function(data){
-    //TODO check soundness
-    //if (newpos !== null){
-    //  n.animateAppear(n.appendTile(newpos[0], newpos[1], 2));
-    //}
   };
   //return object with methods attached.
   return n;

@@ -2,6 +2,7 @@
 import os
 import json
 size = 4
+new_value = 1
 def create_board(size):
     return [[0 for i in range(size)] for ii in range(size)]
 
@@ -38,7 +39,7 @@ def all_empty(board):
         for y, elem in enumerate(lista):
             if elem == 0:
                 allempty.append((x, y))
-    return allempty
+    return allempty 
 
 #def count_non_empty(board):
 #    non_empty = 0
@@ -58,6 +59,15 @@ def serialize_board(board):
     
 def deserialize_board(board_string):
     return json.loads(board_string)
+
+def has_move(board):
+    for rowNo in range(size - 1):
+        for colNo in range(size - 1):
+            if board[rowNo][colNo] == board[rowNo + 1][colNo] or board[rowNo][colNo] == board[rowNo][colNo + 1]:
+                return True
+    return False
+
+    
 
 def next_board(board, updown, downright):
     clear_moves = {}
@@ -96,13 +106,13 @@ def next_board(board, updown, downright):
     static_moves = [(x, y) for (x, y) in all_fields if (x, y) not in generate_moves(all_moves) and board[x][y] != 0]
     
     allempty = all_empty(newboard)
-    #if len(all_moves) != 0 and len(allempty) != 0:
+    changed = (len(all_moves) != 0)
 
-    #newpos = None
-    #TODO extract method as second stage of the protocol
-    #    newpos = allempty[int(os.urandom(1).encode("hex"), 16)%len(allempty)]
-    #    newboard[newpos[0]][newpos[1]] = 2
+    full = (len(allempty) == 0)
+    gameover = not changed and full and not has_move(board)
     
+        
+
     #else:
         #TODO finish the pseudocode
         #if not has_move(board):
@@ -111,13 +121,14 @@ def next_board(board, updown, downright):
         #    pass
         
     results = {
+            "changed": changed,
             "oldboard": board,
             "clear_moves": clear_moves,
             "merge_moves": merge_moves,
-            "all_empty" : allempty,
+            "allempty" : allempty,
             "static_moves": static_moves,
             "newboard": newboard,
-            "gameon": True,
+            "gameover": gameover,
             }
 
     #Speaking of moves, we return row number first, later column number.

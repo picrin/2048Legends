@@ -11,7 +11,7 @@ import hashlib
 import binascii
 import re
 import json
-from logic_glue import *
+from queries import *
 
 def index(request):
     useragent = request.META['HTTP_USER_AGENT']
@@ -24,29 +24,6 @@ def index(request):
 def play(request):
     return processAndRender(request, 'play.html')
 
-def newGame(user):
-    board = move_logic.create_board(move_logic.size)
-    board[1][1] = 1
-    move = Move(
-            belongs_to = None,
-            moveNumber = 0,
-            board = move_logic.serialize_board(board),
-            serverSecret = "0",
-            serverSecretHashed = "0",
-            clientSecret = "0",
-            clientSecretHashed = "0"
-            )
-    move.save()
-    game = Game(
-            belongs_to = user,
-            gameover = False,
-            lastMove = move
-            )
-    game.save()
-    move.belongs_to = game
-    move.save()
-    return game
-    
 def get_board(request):
     resp = {}
     user = token_to_user(request)
@@ -98,23 +75,6 @@ def register(request):
     return processAndRender(request, "register.html")
 
 def exchangeCommitments(request):
-    #tokena = request.POST["tokena"]
-    #get_user from tokena 
-    #retrive user's latest game
-    #check that it is not gameovered, return "403 grab a new board" on error
-    #retrive user's latest move
-    #check that it's not unfinished, i.e. look at clientSecret not empty, return 403 "pacta sunt servanda" on error. If client can't complete the move for whatever reason, second step of the move should allow passing an empty string to agree for any random number
-    #game = Game.objects
-    #game = game.filter(gameover = False)
-    #userid = 
-    #game = game.belongs_to()
-    #token = Tokena.objects
-    #token = token.filter(value=cookie)
-    #token = token.filter(active=True)
-    #print board
-    
-    #TODO 1)
-    
     direction = request.POST["direction"]
     if direction == "right":
         booleans = (False, True)
@@ -128,20 +88,24 @@ def exchangeCommitments(request):
         raise Http404
     user = token_to_user(request)
     game = user.currentGame
-    move = game.lastMove
-    previous_board = move_logic.deserialize_board(move.board)
+    previous_move = game.lastMove
+    previous_board = move_logic.deserialize_board(previous_move.board)
     full_board = move_logic.next_board(previous_board, *booleans)
     board = full_board["newboard"]
-    try:
-        negotiate_first(game, board, request.POST["clientSecretHashed"])
-    except UnfinishedMove:
-        return HttpResponse("Pacta sunt servanda. You are obliged to finish " +
-                            "your previous move by exchanging secrets. To " +
-                            "give up the negotiation and accept server's" +
-                            "choice of the pseudorandom number send" + 
-                            'surrender="True"', status=452)
-    #serverSecretHashed = negotiate_first(request)
-    #full_board["serverSecretHashed"] = serverSecretHashed;
+    allempty = full_board["allempty"]
+    changed = full_board["changed"]
+    if changed:
+        try:
+            current_move = negotiate_first(game, board, allempty, request.POST["clientSecretHashed"])
+        except UnfinishedMove:
+            return HttpResponse("Pacta sunt servanda. You are obliged to finish " +
+                                "your previous move by exchanging secrets. To " +
+                                "give up the negotiation and accept server's" +
+                                "choice of the pseudorandom number send" + 
+                                '"surrender="True""', status=452)
+    else:
+        current_move = previous_move
+    full_board["serverSecretHashed"] = current_move.serverSecretHashed;
     return HttpResponse(json.dumps(full_board),
                         content_type='application/json')
 
@@ -151,18 +115,19 @@ def exchangeSecrets(request):
     user = token_to_user(request)
     game = user.currentGame
     move = game.lastMove
-
+    
     try:
         negotiate_second(game, clientSecret)
     except UnfinishedMove:
-        return HttpResponse("Pacta sunt servanda. You should start the movement by declaring your commitment first", status=452)
+        return HttpResponse("Pacta sunt servanda. You should start the movement\
+by declaring your commitment first", status=452)
 
     if surrender == "True":
         response = {
             "valid": True,
             "serverSecret": "",
             "randomNumber": rand256hex(),
-            "position": 4,
+            "position": None,
             "value": 1
         }
     else:

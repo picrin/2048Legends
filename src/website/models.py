@@ -25,6 +25,7 @@ class Move(models.Model):
     belongs_to         = models.ForeignKey('Game', null=True, blank=True)
     moveNumber         = models.BigIntegerField()
     board              = models.CharField(max_length=200)
+    allempty           = models.CharField(max_length=200)
     serverSecret       = models.CharField(max_length=64)
     serverSecretHashed = models.CharField(max_length=64)
     clientSecret       = models.CharField(max_length=64)

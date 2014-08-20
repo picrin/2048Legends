@@ -28,6 +28,13 @@ window.tZKN5DLe6lyf8Fjx8gb3AKqb8gXkxd7EqMTnAV3Vj26RL = function(n){
     return hexString;
   };
 
+  n.randomWithHash = function(){
+    var random = n.nextRandom();
+    return {
+      random: random,
+      randomHash: window.CryptoJS.SHA256(random).toString()
+    };
+  };
   
   n.stretch_key = function(key, salt, N, r, p){
   	var hash = n.scrypt.crypto_scrypt(

@@ -12,12 +12,40 @@ import re
 import json
 import move_logic
 
-def processAndRender(request, path, templateVars = {}):
+def newGame(user):
+    board = move_logic.create_board(move_logic.size)
+    board[1][1] = 1
+    move = Move(
+            belongs_to = None,
+            moveNumber = 0,
+            board = move_logic.serialize_board(board),
+            serverSecret = "0",
+            serverSecretHashed = "0",
+            clientSecret = "0",
+            clientSecretHashed = "0"
+            )
+    move.save()
+    game = Game(
+            belongs_to = user,
+            gameover = False,
+            lastMove = move
+            )
+    game.save()
+    move.belongs_to = game
+    move.save()
+    return game
+
+def processAndRender(request, path, templateVars = None):
+    if templateVars is None:
+        templateVars = {}
     username = token_to_username(request)
+    print "username", username
     templateData = {}
     if username is not None:
         templateData["authenticated"] = True
         templateData["username"] = username
+    else:
+        templateData["authenticated"] = False
     templateVars.update(templateData)
     return render(request, path, templateVars)
 
@@ -76,16 +104,12 @@ def authenticate(request):
         return HttpResponseForbidden("username needs to have between 3-16 alphanumeric or underscore characters")
     #print str(username)
     bylogin = Person.objects.filter(login = str(username))
-    print bylogin
     badluck = HttpResponseForbidden("wrong username/password")
     if bylogin:
         if len(bylogin) == 1:
             userrecord = bylogin[0]
-            print userrecord
             observed = hmachash(password, userrecord.salt)
             expected = userrecord.hashedPassword
-            print "observed:", observed
-            print "expected:", expected
             if observed != expected:
                 return badluck
             else:
@@ -100,7 +124,6 @@ def authenticate(request):
     else:
         return badluck
 
-#str(hex(int("3702fc",16) ^ int("4f9db7",16)))[2:-1]     
 def create_user(request):
     #ip = get_ip(request)
     username = request.POST["username"]
@@ -122,19 +145,23 @@ def create_user(request):
 class UnfinishedMove(Exception):
     pass
 
-def negotiate_first(game, resolved_board, clientSecretHashed):
+def sha256(string):
+    hasher = hashlib.sha256()
+    hasher.update(string)
+    return hasher.hexdigest()
+
+def negotiate_first(game, resolved_board, allempty, clientSecretHashed):
     previousMove = game.lastMove
     if previousMove.clientSecret == "":
         raise UnfinishedMove("I was expecting client secret now.")
     previousNumber = previousMove.moveNumber
     serverSecret = rand256hex()
-    hasher = hashlib.sha256()
-    hasher.update(serverSecret)
-    serverSecretHashed = hasher.hexdigest()
+    serverSecretHashed = sha256(serverSecret)
     move = Move(
             belongs_to = game,
             moveNumber = previousNumber + 1,
             board = move_logic.serialize_board(resolved_board),
+            allempty = move_logic.serialize_board(allempty),
             serverSecret = serverSecret,
             serverSecretHashed = serverSecretHashed,
             clientSecret = "",
@@ -143,8 +170,24 @@ def negotiate_first(game, resolved_board, clientSecretHashed):
     move.save()
     game.lastMove = move
     game.save()
-    return game
+    return move
     #return HttpResponse(json.dumps({"serverSecretHashed": }), content_type='application/json')
+
+def xorHex(string1, string2):
+    if len(string1) != len(string2) != 64:
+        raise HttpResponseServerError("xored objects need to be 256 bits/ 64 hex-digits")
+    return format(int(string1, 16) ^ int(string2, 16), "x")
+    #that's probably more inefficient
+    #zipped = zip(string1, string2)
+    #for index, tupla in enumerate(zipped):
+    #    inter = lambda hexInt: int(hexInt, 16)
+    #    asInts = map(inter, tupla)
+    #    xored = asInts[0] ^ asInts[1]
+    #    asHex = hex(xored)
+    #    zipped[index] = asHex
+    #print "joined", "".join([string[-1] for string in zipped])
+    
+
 def negotiate_second(game, clientSecret):
     move = game.lastMove
     if move.clientSecret != "":
@@ -160,12 +203,27 @@ def negotiate_second(game, clientSecret):
      #       record.save()
       #      secret = record.serverSecret
        #     return HttpResponse(json.dumps({"serverSecret": secret}), content_type='application/json')
+    check_validity(move)
     return move
-    
+
 def check_validity(move): # isValid, randomNumber
-    return { "valid": True,
-             "serverSecret": "secret",
-             "randomNumber": rand256hex(),
-             "position": 123,
-             "value": 1
+    clientSecret = move.clientSecret
+    clientSecretHashed = move.clientSecretHashed
+    serverSecret = move.serverSecret
+    valid = (sha256(clientSecret) == clientSecretHashed)
+    if valid:
+        randomNumber = xorHex(serverSecret, clientSecret)
+    else:
+        randomNumber = rand256hex()
+    allempty = move_logic.deserialize_board(move.allempty)
+    board = move_logic.deserialize_board(move.board)
+    position = allempty[int(randomNumber, 16)%len(allempty)]
+    board[position[0]][position[1]] = 1
+    move.board = move_logic.serialize_board(board)
+    move.save()
+    return { "valid": valid,
+             "serverSecret": serverSecret,
+             "randomNumber": randomNumber,
+             "position": position,
+             "value": move_logic.new_value
             }
