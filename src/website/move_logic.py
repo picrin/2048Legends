@@ -67,8 +67,6 @@ def has_move(board):
                 return True
     return False
 
-    
-
 def next_board(board, updown, downright):
     clear_moves = {}
     merge_moves = {}
@@ -108,11 +106,9 @@ def next_board(board, updown, downright):
     allempty = all_empty(newboard)
     changed = (len(all_moves) != 0)
 
-    full = (len(allempty) == 0)
-    gameover = not changed and full and not has_move(board)
+    #full = (len(allempty) == 0)
+    #gameover = not changed and full and not has_move(board)
     
-        
-
     #else:
         #TODO finish the pseudocode
         #if not has_move(board):
@@ -128,7 +124,7 @@ def next_board(board, updown, downright):
             "allempty" : allempty,
             "static_moves": static_moves,
             "newboard": newboard,
-            "gameover": gameover,
+            #"gameover": gameover,
             }
 
     #Speaking of moves, we return row number first, later column number.

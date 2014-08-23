@@ -9,7 +9,9 @@
   <div class="invisible">
     {% csrf_token %}
   </div>
-
+  <div id="scoreboard" class="scoreboard">
+  Total score: <span id="score"></span>
+  </div>
   <div class="gameboard" id="gameboard">
     <!-- We're going to programmaticly append tiles and tile slots as children of the divs below. -->
     <div id="tile-placeholders"></div>
@@ -17,7 +19,14 @@
   </div>
   <div id ="swipe">
   </div>
-
+  <script type="text/html" id="gameover">
+  <div id="innerGameover">
+    Gameover!
+    <form action="play" method="get">
+      <input type="submit" value="Play again!" class="btn-success btn-lg" style="width:100%">
+    </form>
+  </div>
+  </script>
 {% endblock %}
 
 {% block scripts %}

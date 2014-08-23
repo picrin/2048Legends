@@ -1,7 +1,6 @@
 ol.simple-list {
     list-style-type: none;
-    list-style-type: decimal !ie; /*IE 7- hack*/
-     
+
     margin: 0;
     margin-left: 3em;
     padding: 0;

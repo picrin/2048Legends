@@ -17,7 +17,7 @@ def newGame(user):
     board[1][1] = 1
     move = Move(
             belongs_to = None,
-            moveNumber = 0,
+            moveNumber = 1,
             board = move_logic.serialize_board(board),
             serverSecret = "0",
             serverSecretHashed = "0",
@@ -176,7 +176,8 @@ def negotiate_first(game, resolved_board, allempty, clientSecretHashed):
 def xorHex(string1, string2):
     if len(string1) != len(string2) != 64:
         raise HttpResponseServerError("xored objects need to be 256 bits/ 64 hex-digits")
-    return format(int(string1, 16) ^ int(string2, 16), "x")
+    inHex = format(int(string1, 16) ^ int(string2, 16), "x")
+    return "0" * (64 - len(inHex)) + inHex
     #that's probably more inefficient
     #zipped = zip(string1, string2)
     #for index, tupla in enumerate(zipped):
@@ -194,7 +195,7 @@ def negotiate_second(game, clientSecret):
         raise UnfinishedMove("I was expecting client comittment now")
     else:
         move.clientSecret = clientSecret
-        move.save()
+        #move.save()
 #        negotiationManager.filter(serverSecretHashed = serverSecretHashed)
  #       records = negotiationManager.filter(clientSecret = "")
   #      if records:
@@ -209,21 +210,32 @@ def negotiate_second(game, clientSecret):
 def check_validity(move): # isValid, randomNumber
     clientSecret = move.clientSecret
     clientSecretHashed = move.clientSecretHashed
-    serverSecret = move.serverSecret
     valid = (sha256(clientSecret) == clientSecretHashed)
     if valid:
+        serverSecret = move.serverSecret
         randomNumber = xorHex(serverSecret, clientSecret)
     else:
+        print "magic"
+        serverSecret = "X"
         randomNumber = rand256hex()
     allempty = move_logic.deserialize_board(move.allempty)
+    emptyNo = len(allempty)
     board = move_logic.deserialize_board(move.board)
-    position = allempty[int(randomNumber, 16)%len(allempty)]
+    position = allempty[int(randomNumber, 16)%emptyNo]
     board[position[0]][position[1]] = 1
+    gameover = False
+    if emptyNo == 1:
+        gameover = not move_logic.has_move(board)
+    
     move.board = move_logic.serialize_board(board)
+    move.belongs_to.gameover = gameover
+    move.belongs_to.save()
     move.save()
     return { "valid": valid,
              "serverSecret": serverSecret,
              "randomNumber": randomNumber,
              "position": position,
-             "value": move_logic.new_value
+             "value": move_logic.new_value,
+             "gameover": gameover,
+             "moveNumber": move.moveNumber
             }

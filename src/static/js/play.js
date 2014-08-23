@@ -4,7 +4,7 @@
 //prohibited. This code is expected to be released under permissive licence
 //after the competition. Currently it is shared for review purpose only.
 
-$(window).load(function(){
+$(document).ready(function(){
   window.Csrf2048wc.setupCSRF();
   window.Play2048wc.orderBoard();
 

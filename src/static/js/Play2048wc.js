@@ -16,13 +16,14 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
   //Keeps a jquery with references to DOM elements representing tiles in a
   //4x4 array.
   n.DOMBoard;
+  n.moveNumber;
   
   //-------------------------------- CONSTANTS --------------------------------
   
   n.boardSize = 4;
   n.tileToGapRatio = 8; // The ratio of one tile to one gap between two tiles.
   n.quick = 160; //ms
-  n.unitsNo = (n.tileToGapRatio + 1) * n.boardSize + 1
+  n.unitsNo = (n.tileToGapRatio + 1) * n.boardSize + 1;
   
   //the divs we'll be appending to, working with and removing from.
   //id of the div to keep tiles in, most of work will be done on n div.
@@ -108,6 +109,8 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
   //this is a pure function. Creates HTML nicely styled with css, which can be
   //furhter worked on or appended to the appropriate div. Notice how the
   //properties left and top are in fact treated as variables, as they keep state.
+  //We try not to rely on this state though for any logic, we use it only
+  //visually, i.e. for animations.
   n.createTileHTML = function(rowNo, colNo, value){
     var values = {
       value: value,
@@ -136,8 +139,7 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
       func(tuple, tuple);
     });
   };
-  
-  
+
   //----------------------------- DOM MANIPULATION -----------------------------
   //These two functions modify appropriate DOM elements adding html and css
   //to make a game board from it (with slots and tiles and shit).
@@ -187,14 +189,27 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
       return undefined;
     }
   };
-  
+
+  n.gameOver = function(){
+    $(n.gameboard).empty();
+    $(n.gameboard).html($("#gameover").html());
+    $("#innerGameover").addClass("gameover");
+    $("#innerGameover").css("top", 10);
+    $("#innerGameover").css("left", 10);
+    $("#innerGameover").css("width", n.width()-20);
+    $("#innerGameover").css("height", n.width()-20);
+  };
+
+  n.updateScore = function(){
+    $("#score").html(n.moveNumber);
+  };
   
   //-------------------------------- ANIMATIONS --------------------------------
   
-  n.animateAppear = function(jq){
+  /*n.animateAppear = function(jq){
     jq.hide();
-    return setTimeout(function(){jq.show()}, n.quick);
-  };
+    return setTimeout(function(){jq.fadeIn()}, n.quick);
+  };*/
   
   n.updateHTML = function(_, index){
     var tile = n.DOMBoard[index[0]][index[1]];
@@ -231,6 +246,24 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
   
   
   //---------------------- NETWORK/ KEYBOARD IO FUNCTIONS ----------------------
+
+  n.prepareGame = function(data){
+    n.DOMBoard = n.createBoard();
+    //purely visual, plots nice tile slots aka placeholders
+    n.prepareSlots();
+    //printing the tiles as obtained from the server
+    n.appendTiles(data["board"]);
+    n.onResize();
+    n.updateScore();
+  };
+  
+  n.onResize = function() {
+    var gameboard = $("#gameboard");
+    var gameboardWidth = gameboard.width();
+    gameboard.css({'height': gameboardWidth + 'px'});
+    n.prepareSlots();
+    n.resizeTiles();
+  };
   
   n.negotiateMove = function(direction, clientSecret, clientCommitment){
     //these variables are here to keep state for eventual 
@@ -251,39 +284,6 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
           452: reveal(true)
         }
       });
-    };
-    
-    var processServerCommitment = function(data){
-      var oldBoard = data["oldboard"];
-      
-      $(n.tiles).empty();
-      n.appendTiles(oldBoard);
-        
-      var mergeMoves = data["merge_moves"];
-      var clearMoves = data["clear_moves"];
-      var staticMoves = data["static_moves"];
-        
-      var newPersistBoard = n.createBoard();
-      var newTempBoard = n.createBoard();
-      
-      var copierPersist = n.boardCopier(n.DOMBoard, newPersistBoard);
-      var copierTemp = n.boardCopier(n.DOMBoard, newTempBoard);
-      
-      n.eachStatic(staticMoves, copierPersist);
-      n.eachMove(clearMoves, copierPersist);
-      
-      n.DOMBoard = newPersistBoard;
-      
-      n.eachMove(mergeMoves, copierTemp);
-      n.eachMove(mergeMoves, n.updateHTML);
-      
-      n.animate(newTempBoard, true);
-      n.animate(newPersistBoard, false);
-      //TODO use some sort of reactive programming or monad to get rid of it.
-      serverCommitment = data["serverSecretHashed"];
-      console.log(serverCommitment);
-      allempty = data["allempty"];
-      reveal(false)();
     };
     
     var reveal = function(surrender){
@@ -309,6 +309,40 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
       };
     };
     
+    var processServerCommitment = function(data){
+      var oldBoard = data["oldboard"];
+      
+      $(n.tiles).empty();
+      n.appendTiles(oldBoard);
+      n.moveNumber = data["moveNumber"];
+      var mergeMoves = data["merge_moves"];
+      var clearMoves = data["clear_moves"];
+      var staticMoves = data["static_moves"];
+        
+      var newPersistBoard = n.createBoard();
+      var newTempBoard = n.createBoard();
+      
+      var copierPersist = n.boardCopier(n.DOMBoard, newPersistBoard);
+      var copierTemp = n.boardCopier(n.DOMBoard, newTempBoard);
+      
+      n.eachStatic(staticMoves, copierPersist);
+      n.eachMove(clearMoves, copierPersist);
+      
+      n.DOMBoard = newPersistBoard;
+      
+      n.eachMove(mergeMoves, copierTemp);
+      n.eachMove(mergeMoves, n.updateHTML);
+      
+      n.animate(newTempBoard, true);
+      n.animate(newPersistBoard, false);
+      //TODO use some sort of reactive programming or monad to get rid of it.
+      serverCommitment = data["serverSecretHashed"];
+      allempty = data["allempty"];
+      if(data["changed"] === true){
+        reveal(false)();
+      }
+    };
+    
     var processServerSecret = function(data){
       var serverSecret = data["serverSecret"];
       var expectedServerCommitment = window.CryptoJS.SHA256(serverSecret).toString();
@@ -329,23 +363,21 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
       }
       xoredHex = xoredHex.join("");
       var serverXoredHex = data["randomNumber"];
-      //TODO check soundness
-      //if (newpos !== null){
-      //  n.animateAppear(n.appendTile(newpos[0], newpos[1], 2));
-      //}
-      //console.log("xored", xoredHex.join(""));
-      //console.log("sored", serverXoredHex);
       n.checkAndBlame(xoredHex, serverXoredHex);
       var position = window.BigNumber(xoredHex, 16);
       position = allempty[position.mod(allempty.length).toNumber()];
       n.checkAndBlame(position[0], data["position"][0]);
       n.checkAndBlame(position[1], data["position"][1]);
       //TODO there's a clever trick to be performed: use undefined instead of nulls (in case of a real empty space), and make nulls denote "real" empty spaces. Then everything should essentialy work, even if one moves the keys really quickly.
-      if(n.DOMBoard[position[0]][position[1]] === null){
+      if(data["moveNumber"] == n.moveNumber){
         n.appendTile(position[0], position[1], data["value"]);
       }
+      if(data["gameover"]){
+        n.gameOver();
+      }
+      n.updateScore();
     };
-    commit();
+  commit();
   } /* negotiateMove */;
   n.checkAndBlame = function(expected, received){
     if(expected !== received){
@@ -389,26 +421,7 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
       return direction;
   };
   
-  
-  //------------------------------ MAIN FUNCTIONS ------------------------------
-  
-  n.prepareGame = function(data){
-    n.DOMBoard = n.createBoard();
-    //purely visual, plots nice tile slots aka placeholders
-    n.prepareSlots();
-    //printing the tiles as obtained from the server
-    n.appendTiles(data["board"]);
-    n.onResize();
-  };
-  
-  n.onResize = function() {
-    var gameboard = $("#gameboard");
-    var gameboardWidth = gameboard.width();
-    gameboard.css({'height': gameboardWidth + 'px'});
-    n.prepareSlots();
-    n.resizeTiles();
-  };
-  //return object with methods attached.
+  //return the object with methods attached.
   return n;
 };
 if (window.Play2048wc === undefined){

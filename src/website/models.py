@@ -5,20 +5,20 @@ class Person(models.Model):
     hashedPassword = models.CharField(max_length=64)
     salt           = models.CharField(max_length=64)
     currentGame    = models.ForeignKey('Game', null=True, blank=True)
-    def __unicode__(self):
-        return str(self.login)
+    #def __unicode__(self):
+    #    return str(self.login)
 
 class Tokena(models.Model):
     value      = models.CharField(max_length=64)
     active     = models.BooleanField()
     created    = models.DateTimeField()
     belongs_to = models.ForeignKey(Person)
-    def __unicode__(self):
-        return str(self.value)
+    #def __unicode__(self):
+    #    return str(self.value)
 
 class Game(models.Model):
     belongs_to = models.ForeignKey(Person, null=True)
-    lastMove = models.ForeignKey('Move', null=True, blank=True)
+    lastMove   = models.ForeignKey('Move', null=True, blank=True)
     gameover   = models.BooleanField()
 
 class Move(models.Model):

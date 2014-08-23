@@ -94,7 +94,7 @@ def exchangeCommitments(request):
     board = full_board["newboard"]
     allempty = full_board["allempty"]
     changed = full_board["changed"]
-    if changed:
+    if not game.gameover:
         try:
             current_move = negotiate_first(game, board, allempty, request.POST["clientSecretHashed"])
         except UnfinishedMove:
@@ -104,8 +104,12 @@ def exchangeCommitments(request):
                                 "choice of the pseudorandom number send" + 
                                 '"surrender="True""', status=452)
     else:
+        #client might misunderstand and follow up with exchangeSecrets.
+        #This is not a very bad bug, but should not happen anyway.
         current_move = previous_move
+        
     full_board["serverSecretHashed"] = current_move.serverSecretHashed;
+    full_board["moveNumber"] = current_move.moveNumber
     return HttpResponse(json.dumps(full_board),
                         content_type='application/json')
 
@@ -122,15 +126,6 @@ def exchangeSecrets(request):
         return HttpResponse("Pacta sunt servanda. You should start the movement\
 by declaring your commitment first", status=452)
 
-    if surrender == "True":
-        response = {
-            "valid": True,
-            "serverSecret": "",
-            "randomNumber": rand256hex(),
-            "position": None,
-            "value": 1
-        }
-    else:
-        response = check_validity(move)
+    response = check_validity(move)
     return HttpResponse(json.dumps(response),
                         content_type='application/json')

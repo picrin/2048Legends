@@ -3,8 +3,27 @@
   position: relative;
   border-radius: 7px;
   width: 100%;
-  max-width:400px;
+  max-width: 400px;
 }
+
+.gameover{
+  position: absolute;
+  text-align: center;
+  background-color: #AD798A;
+  font-size: 20px;
+  border-radius: 5px;
+}
+
+.scoreboard{
+  background-color: #99AABD;
+  font-size: 20px;
+  position: relative;
+  border-radius: 7px;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 20px;
+}
+
 
 .tile, .tile-placeholder{
   position: absolute;

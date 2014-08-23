@@ -14,7 +14,6 @@
     <div class="invisible">
       {% csrf_token %}
     </div>
-
     <nav class="navbar navbar-default" role="navigation">
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
@@ -26,7 +25,6 @@
             <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" style="font-size:25px">Prize pool: 20,348$</a>
-
         </div>
         
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -50,6 +48,10 @@
         </div><!-- /.navbar-collapse -->
       </div>
     </nav>
+    <div class="alert alert-danger alert-dismissible" style="font-size: 20px" role="alert">
+      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+      <strong>Warning!</strong> That's a pre-alpha release of the website, version 0. This means there is still missing functionality and functionality provided might have obvious known issues. Work in progress. <strong>No real money is involved.</strong>
+    </div>
     {% block body %}
     {% endblock %}
     <!-- TODO try to see if we can slim these down. Aim for no more then 400ms of loading -->
