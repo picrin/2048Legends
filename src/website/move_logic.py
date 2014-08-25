@@ -41,14 +41,6 @@ def all_empty(board):
                 allempty.append((x, y))
     return allempty 
 
-#def count_non_empty(board):
-#    non_empty = 0
-#    for x, lista in enumerate(board):
-#        for y, elem in enumerate(lista):
-#            if elem != 0:
-#                non_empty += 1
-#    return non_empty
-
 def generate_moves(moves):
     for x in moves:
         for y in moves[x]:

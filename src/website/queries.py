@@ -222,7 +222,6 @@ def negotiate_second(game, clientSecret):
        #     return HttpResponse(json.dumps({"serverSecret": secret}), content_type='application/json')
     return check_validity(move)
 
-
 def check_validity(move): # isValid, randomNumber
     clientSecret = move.clientSecret
     clientSecretHashed = move.clientSecretHashed
@@ -242,15 +241,15 @@ def check_validity(move): # isValid, randomNumber
         raise Error("moveNumber != sum(board), database corruption, we're all going to die.")
     gameover = False
     result = move.moveNumber
+    game = move.belongs_to
     if emptyNo == 1:
         gameover = not move_logic.has_move(board)
         if gameover:
             result = move.moveNumber + 1
-            move.belongs_to.result = result
-    
+            game.result = result
     move.board = move_logic.serialize_board(board)
-    move.belongs_to.gameover = gameover
-    move.belongs_to.save()
+    game.gameover = gameover
+    game.save()
     move.save()
     return { "valid": valid,
              "serverSecret": serverSecret,

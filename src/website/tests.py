@@ -23,7 +23,8 @@ class Bleh(TestCase):
         self.assertEqual(newboard[1][0], 4)
         self.assertEqual(newboard[2][0], 2)
         self.assertEqual(newboard[3][0], 2)
-    #TODO test moves in other directions as well.
+        #TODO test moves in other directions as well.
+    """
     def test_protocol(self):
         #Assume one user logged in in one place with one non-gameovered game.
         examplePerson = Person(login="picrin", hashedPassword="1")
@@ -50,4 +51,8 @@ class Bleh(TestCase):
         negotiate_first(game, resolved_board, clientSecretHashed)
         
         #clientSecret = str(request.POST["clientSecret"])
-
+    """
+    #sometimes game over triggers too early. Especially when allempty = [[3, 3]] and [3, 2] is 1
+    def gameover(self):
+        pass
+        

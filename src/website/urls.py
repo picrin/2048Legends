@@ -14,5 +14,6 @@ urlpatterns = patterns('',
     url(r'^signup$', views.signup),
     url(r'^get_user$', views.get_user),
     url(r'^register$', views.register),
-    url(r'^signout$', views.logout)
+    url(r'^signout$', views.logout),
+    url(r'^leaderboard$', views.leaderboard)
 )

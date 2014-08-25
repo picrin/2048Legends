@@ -23,7 +23,21 @@ def index(request):
     return processAndRender(request, 'main.html')
 
 def play(request):
-    return processAndRender(request, 'play.html')
+    return processAndRender(request, 'play.html', templateVars={"active_play": True})
+
+def genLeaders():
+    for game in Game.objects.all().order_by('-result'):
+        user = game.belongs_to
+        result = game.result
+        if user is None:
+            username = "anonymous"
+        else:
+            username = user.login
+        if result is not None:
+            yield str(username), game.result
+
+def leaderboard(request):
+    return processAndRender(request, "leaderboard.html", templateVars={"active_leaderboard": True, "results":list(genLeaders())})
 
 def get_board(request):
     resp = {}
@@ -33,7 +47,7 @@ def get_board(request):
     setGameID = False
     if user is not None:
         game = user.currentGame
-        if game is None or game.gameover:
+        if game is None:
             game = newGame(user)
             user.currentGame = game
             user.save()
@@ -42,7 +56,14 @@ def get_board(request):
     else:
         game = newGame(None)
         setGameID = True
-        
+    if game.gameover:
+        game = newGame(user)
+        if user is None:
+            setGameID = True
+        else:
+            user.currentGame = game
+            user.save()
+    
     resp["board"] = move_logic.deserialize_board(game.lastMove.board)
     resp["moveNumber"] = game.lastMove.moveNumber
     response = HttpResponse(json.dumps(resp), content_type='application/json')
@@ -70,14 +91,6 @@ def signin(request):
 
 def signup(request):
     return create_user(request)
-
-#def test(request):
-#    board = [[1, 0, 1, 3], [0, 1, 2, 3], [0, 0, 1, 2], [2, 0, 3 ,0]]
-#    move_logic.pretty_board(board)
-#    result = move_logic.next_board(board, True, False)
-#    move_logic.pretty_board(result["newboard"])
-#ontent='', content_type=None, status=200, reason=None
-#    return HttpResponse(simplejson.dumps(result), content_type='application/json')
 
 def register(request):
     return processAndRender(request, "register.html")

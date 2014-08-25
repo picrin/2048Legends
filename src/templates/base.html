@@ -30,10 +30,10 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse"  style="font-size:20px" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav navbar-left">
-            <li><a href="play">Play</a></li>
-            <li class="active"><a href="#">Buy games (3 left)</a></li>
-            <li><a href="#">Leaderboard</a></li>
-            <li><a href="#">About</a></li>
+            <li {% if active_play %} class="active" {% endif %}><a href="play">Play</a></li>
+            <li {% if active_buy %} class="active" {% endif %}><a href="#">Buy games (3 left)</a></li>
+            <li {% if active_leaderboard %} class="active" {% endif %}><a href="leaderboard">Leaderboard</a></li>
+            <li {% if active_about %} class="active" {% endif %}><a href="#">About</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {% if authenticated %}
@@ -81,13 +81,13 @@
       src="static/js/Play2048wc.js">
     </script>
 
-    <!--TODO switch off loading for the main page-->
+    <!--TODO do not load for the main page-->
     <script
       type="application/javascript"
       src="static/js/Csrf2048wc.js">
     </script>
     
-    <!--TODO switch off loading of these scripts when no need for cryptography-->
+    <!--TODO do not load these scripts when no need for cryptography-->
     <script
       type="application/javascript"
       src='https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/sha256.js'>
