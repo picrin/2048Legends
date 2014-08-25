@@ -10,17 +10,18 @@ class Person(models.Model):
 
 class Tokena(models.Model):
     value      = models.CharField(max_length=64)
-    active     = models.BooleanField()
+    active     = models.BooleanField(default=False)
     created    = models.DateTimeField()
     belongs_to = models.ForeignKey(Person)
     #def __unicode__(self):
     #    return str(self.value)
 
 class Game(models.Model):
+    gameid     = models.CharField(max_length=64)
     belongs_to = models.ForeignKey(Person, null=True)
     lastMove   = models.ForeignKey('Move', null=True, blank=True)
-    gameover   = models.BooleanField()
-
+    gameover   = models.BooleanField(default=False)
+    result     = models.BigIntegerField(null=True)
 class Move(models.Model):
     belongs_to         = models.ForeignKey('Game', null=True, blank=True)
     moveNumber         = models.BigIntegerField()

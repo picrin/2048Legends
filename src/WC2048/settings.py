@@ -106,11 +106,3 @@ if DEBUG:
         'django.contrib.staticfiles.finders.FileSystemFinder',
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     )
-
-from django.contrib import admin
-
-from django.db.models import get_models, get_app
-
-for model in get_models(get_app('website')):
-    admin.site.register(model)
-

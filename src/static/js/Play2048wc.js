@@ -22,7 +22,7 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
   
   n.boardSize = 4;
   n.tileToGapRatio = 8; // The ratio of one tile to one gap between two tiles.
-  n.quick = 160; //ms
+  n.quick = 120; //ms
   n.unitsNo = (n.tileToGapRatio + 1) * n.boardSize + 1;
   
   //the divs we'll be appending to, working with and removing from.
@@ -253,6 +253,7 @@ window.xVJ0NVCaH9voS9bYeRjwha4dLUKEf8f16hmb3ipzAk8XB=function(n){ //n for namesp
     n.prepareSlots();
     //printing the tiles as obtained from the server
     n.appendTiles(data["board"]);
+    n.moveNumber = data["moveNumber"];
     n.onResize();
     n.updateScore();
   };

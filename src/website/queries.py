@@ -26,6 +26,7 @@ def newGame(user):
             )
     move.save()
     game = Game(
+            gameid = rand256hex(),
             belongs_to = user,
             gameover = False,
             lastMove = move
@@ -87,6 +88,21 @@ def token_to_user(request):
     if token is not None:
         return token.belongs_to
     return None
+
+def cookie_to_game(request):
+    gameid = request.COOKIES.get("gameid")
+    if gameid is None:
+        return None
+    game = Game.objects.filter(gameid=gameid)
+    return game[0]
+
+
+def token_to_game(request):
+    user = token_to_user(request)
+    if user is None:
+        return None, cookie_to_game(request)
+    else:
+        return user, user.currentGame
 
 def rand256hex():
     with open("/dev/urandom", 'rb') as f:
@@ -195,7 +211,7 @@ def negotiate_second(game, clientSecret):
         raise UnfinishedMove("I was expecting client comittment now")
     else:
         move.clientSecret = clientSecret
-        #move.save()
+        
 #        negotiationManager.filter(serverSecretHashed = serverSecretHashed)
  #       records = negotiationManager.filter(clientSecret = "")
   #      if records:
@@ -204,8 +220,8 @@ def negotiate_second(game, clientSecret):
      #       record.save()
       #      secret = record.serverSecret
        #     return HttpResponse(json.dumps({"serverSecret": secret}), content_type='application/json')
-    check_validity(move)
-    return move
+    return check_validity(move)
+
 
 def check_validity(move): # isValid, randomNumber
     clientSecret = move.clientSecret
@@ -215,17 +231,22 @@ def check_validity(move): # isValid, randomNumber
         serverSecret = move.serverSecret
         randomNumber = xorHex(serverSecret, clientSecret)
     else:
-        print "magic"
         serverSecret = "X"
         randomNumber = rand256hex()
     allempty = move_logic.deserialize_board(move.allempty)
     emptyNo = len(allempty)
     board = move_logic.deserialize_board(move.board)
     position = allempty[int(randomNumber, 16)%emptyNo]
-    board[position[0]][position[1]] = 1
+    board[position[0]][position[1]] = move_logic.new_value
+    if move.moveNumber != sum(map(sum, board)):
+        raise Error("moveNumber != sum(board), database corruption, we're all going to die.")
     gameover = False
+    result = move.moveNumber
     if emptyNo == 1:
         gameover = not move_logic.has_move(board)
+        if gameover:
+            result = move.moveNumber + 1
+            move.belongs_to.result = result
     
     move.board = move_logic.serialize_board(board)
     move.belongs_to.gameover = gameover
@@ -237,5 +258,5 @@ def check_validity(move): # isValid, randomNumber
              "position": position,
              "value": move_logic.new_value,
              "gameover": gameover,
-             "moveNumber": move.moveNumber
+             "moveNumber": result
             }

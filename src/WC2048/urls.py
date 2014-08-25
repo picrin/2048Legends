@@ -13,3 +13,11 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^', include('website.urls')),
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+#from django.contrib import admin
+#
+#from django.db.models import get_models, get_app
+#
+#for model in get_models(get_app('website')):
+#    admin.site.register(model)
+
