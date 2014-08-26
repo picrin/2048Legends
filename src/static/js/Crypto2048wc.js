@@ -10,7 +10,8 @@ window.tZKN5DLe6lyf8Fjx8gb3AKqb8gXkxd7EqMTnAV3Vj26RL = function(n){
   n.scrypt = window.scrypt_module_factory();
   n.salt = "2048wc.com says: Nic dwa razy sie nie zdarza i nie zdarzy. Z tej przyczyny zrodzilismy sie bez wprawy i pomrzemy bez rutyny.";
   n.N = 16384;//WARNING -- this value of N parameter will crash firefox with DEV-TOOLS open. It won't crash it without dev-tools.
-  //n.N = 2048; If evidence is presented that number above is too large, use a uncomment this.
+  n.N = 8192; //let's choose something in the middle
+  //n.N = 2048; If evidence is presented that number above is too large, uncomment this.
   n.r = 8;
   n.p = 1;
   
@@ -114,7 +115,15 @@ window.tZKN5DLe6lyf8Fjx8gb3AKqb8gXkxd7EqMTnAV3Vj26RL = function(n){
       url: "signup",
       data: {username: username, password: sharedSecret},
       async: true,
-      success: function(_){}
+      statusCode:{
+          200: function(_){
+            location.replace("/login");
+          },
+          403: function(data){
+            $("#footnote").html(data.responseText);
+            $("#footnote").css("color", "red");
+          }
+      }
     });
   };
   
@@ -131,7 +140,15 @@ window.tZKN5DLe6lyf8Fjx8gb3AKqb8gXkxd7EqMTnAV3Vj26RL = function(n){
       url: "signin",
       data: {username: username, password: sharedSecret},
       async: true,
-      success: function(_){location.replace("/")}
+      statusCode:{
+          200: function(_){
+            location.replace("/");
+          },
+          403: function(data){
+            $("#footnote").html(data.responseText);
+            $("#footnote").css("color", "red");
+          }
+      }
     });
     //console.log(localStorage.getItem("nextRandom"))
     //console.log(CryptoJS.SHA256("gugugu")["words"][0])

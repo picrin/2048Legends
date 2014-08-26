@@ -144,7 +144,8 @@ def create_user(request):
     #ip = get_ip(request)
     username = request.POST["username"]
     password = request.POST["password"]
-    if not re.match("^\w{3,16}$", username):
+    #, 
+    if not re.match("^\w{3,16}$", username) or any([re.search(disallowed, username) for disallowed in ["^anonymous$", "^admin$", "^administrator$", "^moderator$", "^picrin$", "^kutykula$", "adam", "kurkiewicz", "kurkeiwicz"]]):
         return HttpResponseForbidden("username needs to have between 3-16 alphanumeric or underscore characters")
     #print str(username)
     bylogin = Person.objects.filter(login = str(username))

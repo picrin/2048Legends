@@ -24,6 +24,7 @@ def index(request):
 
 def play(request):
     return processAndRender(request, 'play.html', templateVars={"active_play": True})
+    #return HttpResponse(str(Game.objects.all()[0].lastMove.board))
 
 def genLeaders():
     for game in Game.objects.all().order_by('-result'):

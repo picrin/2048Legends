@@ -5,6 +5,12 @@
 {% endblock %}
 
 {% block body %}
+  {% if not authenticated %}
+    <div class="alert alert-success" style="font-size: 20px" role="alert">
+      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        Hello anonymous. Log in to have your game recorded and your result being displayed on the leaderboard.
+    </div>
+  {% endif %}
   <!-- a csrf token to prevent clickjacking -->
   <div class="invisible">
     {% csrf_token %}

@@ -54,5 +54,33 @@ class Bleh(TestCase):
     """
     #sometimes game over triggers too early. Especially when allempty = [[3, 3]] and [3, 2] is 1
     def gameover(self):
-        pass
-        
+        board = [[128, 64, 32, 16], [64, 32, 16, 8], [32, 16, 8, 4], [16, 8, 1, 0]]
+        boardString = move_logic.serialize_board(board)
+        allempty = [[3, 3]]
+        allemptyString = move_logic.serialize_board(allempty)
+        move = Move(
+                belongs_to         = None,
+                moveNumber         = 100,
+                board              = boardString,
+                allempty           = allemptyString,
+                serverSecret       = "a04aa4256d3fb3847c9a594975fd26efbdebac31bd17b88b0b39be592567230b",
+                serverSecretHashed = "aa1e27d29a4e17d308534ceb6c2774d9ec4f2b9ef1022a49d66a3770ca424a13",
+                clientSecret       = "",
+                clientSecretHashed = "fee9aa280f017fd716c496afe03a6291bf9a0fe80f07a9026efc4257b71fe848",
+                )
+        move.save()
+        game = Game(
+                belongs_to = None,
+                lastMove   = move,
+                gameover   = False,
+                result     = None,
+                gameid     = "jakasgra"
+                )
+        game.save()
+        move.belongs_to = game
+        move.save()
+        returned = negotiate_second(game, "b7d64a5f92b663560a3f000a947fae7cad549a5c2e396a4828c5151fd5034ce4")
+        self.assertEqual(returned["valid"], True)
+        self.assertEqual(returned["gameover"], False)
+
+

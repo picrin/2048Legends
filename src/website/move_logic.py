@@ -54,8 +54,12 @@ def deserialize_board(board_string):
 
 def has_move(board):
     for rowNo in range(size - 1):
+        for colNo in range(size):
+            if board[rowNo][colNo] == board[rowNo + 1][colNo]:
+                return True
+    for rowNo in range(size):
         for colNo in range(size - 1):
-            if board[rowNo][colNo] == board[rowNo + 1][colNo] or board[rowNo][colNo] == board[rowNo][colNo + 1]:
+            if board[rowNo][colNo] == board[rowNo][colNo + 1]:
                 return True
     return False
 
@@ -98,16 +102,6 @@ def next_board(board, updown, downright):
     allempty = all_empty(newboard)
     changed = (len(all_moves) != 0)
 
-    #full = (len(allempty) == 0)
-    #gameover = not changed and full and not has_move(board)
-    
-    #else:
-        #TODO finish the pseudocode
-        #if not has_move(board):
-        #    return gameon: False
-        #else:
-        #    pass
-        
     results = {
             "changed": changed,
             "oldboard": board,
@@ -116,10 +110,8 @@ def next_board(board, updown, downright):
             "allempty" : allempty,
             "static_moves": static_moves,
             "newboard": newboard,
-            #"gameover": gameover,
             }
-
-    #Speaking of moves, we return row number first, later column number.
+    #Speaking of moves, we return row number first, column number.
     #This might seem strange, but it's natural once you
     #look at our representation: we have 4 small tables
     #of rows in a bigger table. So think rows/colums, not x/y
