@@ -2,7 +2,6 @@
 from django.conf.urls import patterns, url
 
 from website import views
-
 urlpatterns = patterns('',
     url(r'^$', views.index),
     url(r'^play$', views.play),
@@ -15,5 +14,6 @@ urlpatterns = patterns('',
     url(r'^get_user$', views.get_user),
     url(r'^register$', views.register),
     url(r'^signout$', views.logout),
-    url(r'^leaderboard$', views.leaderboard)
+    url(r'^leaderboard$', views.leaderboard),
+    url(r'^user/\w{3,16}$', views.user),
 )

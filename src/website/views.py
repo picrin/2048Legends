@@ -13,7 +13,6 @@ import re
 import json
 from queries import *
 
-
 def index(request):
     useragent = request.META['HTTP_USER_AGENT']
     goodBrowsers = ["Opera", "Lunascape", "Sleipnir"]
@@ -25,6 +24,18 @@ def index(request):
 def play(request):
     return processAndRender(request, 'play.html', templateVars={"active_play": True})
     #return HttpResponse(str(Game.objects.all()[0].lastMove.board))
+
+def user(request):
+    print(dir(request))
+    username = request.path.split("/")[-1]
+    people = Person.objects.filter(login = username)
+    if not people:
+        raise Http404()
+    templateVars = {"results": genPersonal(people[0]), "username": username}
+    return processAndRender(request, "user.html", templateVars)
+
+def genPersonal(person):
+    return [game.result for game in Game.objects.filter(belongs_to=person).order_by("-result") if game.result is not None]
 
 def genLeaders():
     for game in Game.objects.all().order_by('-result'):
@@ -54,16 +65,18 @@ def get_board(request):
             user.save()
     elif hasGameID:
         game = cookie_to_game(request)
+        if game is None:
+            game = newGame(user)
+            setGameID = True
     else:
         game = newGame(None)
         setGameID = True
     if game.gameover:
         game = newGame(user)
-        if user is None:
-            setGameID = True
-        else:
-            user.currentGame = game
-            user.save()
+        setGameID = True
+    if user is not None:
+        user.currentGame = game
+        user.save()
     
     resp["board"] = move_logic.deserialize_board(game.lastMove.board)
     resp["moveNumber"] = game.lastMove.moveNumber

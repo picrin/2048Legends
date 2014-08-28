@@ -30,18 +30,18 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse"  style="font-size:20px" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav navbar-left">
-            <li {% if active_play %} class="active" {% endif %}><a href="play">Play</a></li>
+            <li {% if active_play %} class="active" {% endif %}><a href="/play">Play</a></li>
             <li {% if active_buy %} class="active" {% endif %}><a href="#">Buy games (3 left)</a></li>
-            <li {% if active_leaderboard %} class="active" {% endif %}><a href="leaderboard">Leaderboard</a></li>
+            <li {% if active_leaderboard %} class="active" {% endif %}><a href="/leaderboard">Leaderboard</a></li>
             <li {% if active_about %} class="active" {% endif %}><a href="#">About</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {% if authenticated %}
-              <li><a href="user/{{username}}">{{username}}</a></li>
-              <li><a href="signout">Sign out</a></li>
+              <li><a href="/user/{{username}}">{{username}}</a></li>
+              <li><a href="/signout">Sign out</a></li>
             {% else %}
-              <li><a href="register">Register</a></li>
-              <li><a href="login">Sign in</a></li>
+              <li><a href="/register">Register</a></li>
+              <li><a href="/login">Sign in</a></li>
             {% endif %}
           </ul>
           

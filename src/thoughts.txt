@@ -1,4 +1,57 @@
 test that HMACs don't overflow, or use a better primitive (256-bit truncated sha512 or hmac-sha256(sha256(x), y).
-make sure that user creation checks e-mail and CAPTHA.
-give a thought to creating a good, practical crypto library, cause most cryptographers are excellent mathematicians, but dumb engineers, and most programmers are excellent engineers but dumb mathematicians. So, our good crypto library would have a fast hash function...
+make sure that user creation checks e-mail and CAPTCHA.
+give a thought to creating a good, practical crypto library, cause most cryptographers are excellent mathematicians, but dumb engineers, and most programmers are excellent engineers but dumb mathematicians.
 make sure that all user input is properly escaped.
+
+Language Johnny
+
+Hello World:
+
+------------------------------
+INPUT:
+{}
+{}
+{}
+
+OUTPUT:
+{}
+
+------------------------------
+INPUT:
+{}
+{}
+[]
+
+OUTPUT:
+[]
+
+------------------------------
+INPUT:
+[
+  word,
+  ...
+]
+[
+  [ <ascending>, word ],
+  ...
+]
+[
+  "Johnny",
+  "John",
+  "Janek",
+  "Jasiek"
+]
+
+OUTPUT:
+{
+  [ 0, "Johnny"],
+  [ 1, "John"],
+  [ 2, "Janek"],
+  [ 3, "Jasiek"]
+}
+
+------------------------------
+INPUT:
+{
+  
+}

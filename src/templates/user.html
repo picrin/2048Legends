@@ -10,22 +10,14 @@
       <thead>
         <tr>
           <th>
-            Username
-          </th>
-          <th>
-            Score
+            Scores of user {{username}}
           </th>
         </tr>
       </thead>
       <tbody>
         {% for result in results %}
         <tr>
-          {% if result.0 != "anonymous" %}
-            <td><a href="/user/{{result.0}}">{{result.0}}</a></td>
-          {% else %}
-            <td>{{result.0}}</td>
-          {% endif %}
-          <td>{{result.1}}</td>
+          <td>{{result}}</td>
         </tr>
         {% endfor %}
       </tbody>

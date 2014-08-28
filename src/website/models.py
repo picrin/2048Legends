@@ -5,6 +5,7 @@ class Person(models.Model):
     hashedPassword = models.CharField(max_length=64)
     salt           = models.CharField(max_length=64)
     currentGame    = models.ForeignKey('Game', null=True, blank=True)
+    bestResult     = models.BigIntegerField(default=0)
     #def __unicode__(self):
     #    return str(self.login)
 
@@ -22,6 +23,7 @@ class Game(models.Model):
     lastMove   = models.ForeignKey('Move', null=True, blank=True)
     gameover   = models.BooleanField(default=False)
     result     = models.BigIntegerField(null=True)
+
 class Move(models.Model):
     belongs_to         = models.ForeignKey('Game', null=True, blank=True)
     moveNumber         = models.BigIntegerField()

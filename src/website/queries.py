@@ -94,7 +94,10 @@ def cookie_to_game(request):
     if gameid is None:
         return None
     game = Game.objects.filter(gameid=gameid)
-    return game[0]
+    if game:
+        return game[0]
+    else:
+        return None
 
 
 def token_to_game(request):
@@ -248,6 +251,9 @@ def check_validity(move): # isValid, randomNumber
         if gameover:
             result = move.moveNumber + 1
             game.result = result
+            #person = game.belongs_to
+            #if result > person.bestResult:
+            #    person.bestResult = result
     move.board = move_logic.serialize_board(board)
     game.gameover = gameover
     game.save()
