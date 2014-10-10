@@ -18,12 +18,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
+ALLOWED_HOSTS = [
+    'localhost',  # Allow domain and subdomains
+    '.example.com.',  # Also allow FQDN and subdomains
+]
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '1337'
 
 if not DEBUG:
+    import binascii
     with open("/dev/urandom", 'rb') as f:
         SECRET_KEY = binascii.hexlify(f.read(32))
 
@@ -32,7 +37,6 @@ TEMPLATE_DEBUG = True
 TEMPLATE_DIRS=(
     os.path.join(BASE_DIR, 'templates'),
 )
-ALLOWED_HOSTS = []
 
 
 # Application definition
