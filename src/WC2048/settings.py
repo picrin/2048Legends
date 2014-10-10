@@ -24,6 +24,7 @@ DEBUG = True
 SECRET_KEY = '1337'
 
 if not DEBUG:
+    import binascii
     with open("/dev/urandom", 'rb') as f:
         SECRET_KEY = binascii.hexlify(f.read(32))
 
@@ -32,7 +33,7 @@ TEMPLATE_DEBUG = True
 TEMPLATE_DIRS=(
     os.path.join(BASE_DIR, 'templates'),
 )
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["2048wc.com"]
 
 
 # Application definition

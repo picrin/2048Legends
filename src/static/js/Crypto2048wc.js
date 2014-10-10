@@ -113,7 +113,7 @@ window.tZKN5DLe6lyf8Fjx8gb3AKqb8gXkxd7EqMTnAV3Vj26RL = function(n){
     $.ajax({
       type: 'POST',
       url: "signup",
-      data: {username: username, password: sharedSecret},
+      data: {username: username, password: password},
       async: true,
       statusCode:{
           200: function(_){
@@ -138,7 +138,7 @@ window.tZKN5DLe6lyf8Fjx8gb3AKqb8gXkxd7EqMTnAV3Vj26RL = function(n){
     $.ajax({
       type: 'POST',
       url: "signin",
-      data: {username: username, password: sharedSecret},
+      data: {username: username, password: password},
       async: true,
       statusCode:{
           200: function(_){

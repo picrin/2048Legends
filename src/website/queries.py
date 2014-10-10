@@ -143,11 +143,7 @@ def authenticate(request):
     else:
         return badluck
 
-def create_user(request):
-    #ip = get_ip(request)
-    username = request.POST["username"]
-    password = request.POST["password"]
-    #, 
+def create_user_simple(username, password):
     if not re.match("^\w{3,16}$", username) or any([re.search(disallowed, username) for disallowed in ["^anonymous$", "^admin$", "^administrator$", "^moderator$", "^picrin$", "^kutykula$", "adam", "kurkiewicz", "kurkeiwicz"]]):
         return HttpResponseForbidden("username needs to have between 3-16 alphanumeric or underscore characters")
     #print str(username)
@@ -162,6 +158,12 @@ def create_user(request):
     else:
         return HttpResponseForbidden("username already exists")
 
+def create_user(request):
+    #ip = get_ip(request)
+    username = request.POST["username"]
+    password = request.POST["password"]
+    return create_user_simple(username, password)
+    
 class UnfinishedMove(Exception):
     pass
 
