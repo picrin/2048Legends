@@ -12,7 +12,9 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
     #url(r'^admin/', include(admin.site.urls)),
     url(r'^', include('website.urls')),
-) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+)
+if settings.DEBUG == True:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 #from django.contrib import admin
 #
