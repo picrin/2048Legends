@@ -117,13 +117,16 @@ def callSingle(user, callback, argsTuple):
         return callback(*argsTuple), True
     lock = userlocks.setdefault(user.login, thread.allocate_lock())
     allowed_in = lock.acquire_lock(False)
+    fail_response = HttpResponse("I'm doing a database operation for you. It's a difficult and delicate process. I need to focus. Alone. Do not disturb.", status=420)
     if allowed_in:
         try:
             return callback(*argsTuple), True
+        except Exception as e:
+            fail_response, False
         finally:
             lock.release()
     else:
-        return HttpResponse("I'm doing a database operation for you. It's a difficult and delicate process. I need to focus. Alone. Do not disturb.", status=420), False
+        return fail_response, False
 
 def exchangeCommitments(request):
     direction = request.POST["direction"]

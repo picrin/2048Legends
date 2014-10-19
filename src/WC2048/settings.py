@@ -21,8 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    'localhost',  # Allow domain and subdomains
-    '.example.com.',  # Also allow FQDN and subdomains
+    '.c9.io',  # Allow domain and subdomains
 ]
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '1337'
