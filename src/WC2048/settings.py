@@ -22,7 +22,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = [
     'localhost',  # Allow domain and subdomains
-    '.example.com.',  # Also allow FQDN and subdomains
+    '.2048wc.com',  # Also allow FQDN and subdomains
 ]
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '1337'
