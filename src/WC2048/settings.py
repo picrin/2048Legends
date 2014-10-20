@@ -23,6 +23,8 @@ DEBUG = False
 ALLOWED_HOSTS = [
     'localhost',  # Allow domain and subdomains
     '.2048wc.com',  # Also allow FQDN and subdomains
+    '.c9.io'  # Allow domain and subdomains
+>>>>>>> 9e77d43cbb92c9d32a36830e56a0cff8e2ead29c
 ]
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '1337'
