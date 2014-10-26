@@ -1,1 +1,1 @@
-docker run -p 80:80 picrin/2048_nginx
+docker run --net host -p 80:80 picrin/2048_nginx

@@ -18,21 +18,31 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
+msg = "isDebug file is expected to consist of a single charcter 0 or 1"
+try:
+    with open("WC2048/isDebug") as isDebug:
+        isDebug = isDebug.readlines()[0][0]
+        if isDebug == "0":
+            DEBUG = False
+        elif isDebug == "1":
+            DEBUG = True
+        else:
+            raise Exception(msg)
+except Exception as e:
+    #raise Exception(e.message +)
+    #print e.message
+    raise e
 ALLOWED_HOSTS = [
-    'localhost',  # Allow domain and subdomains
-    '.2048wc.com',  # Also allow FQDN and subdomains
-    '.c9.io'  # Allow domain and subdomains
->>>>>>> 9e77d43cbb92c9d32a36830e56a0cff8e2ead29c
+    "127.0.0.1",
 ]
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '1337'
 
+# SECURITY WARNING: keep the secret key used in production secret!
 if not DEBUG:
     import binascii
     with open("/dev/urandom", 'rb') as f:
         SECRET_KEY = binascii.hexlify(f.read(32))
+if DEBUG:
+    SECRET_KEY = '1337'
 
 TEMPLATE_DEBUG = True
 
