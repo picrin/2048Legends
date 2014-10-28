@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # SECURITY WARNING: don't run with debug turned on in production!
 msg = "isDebug file is expected to consist of a single charcter 0 or 1"
 try:
-    with open("WC2048/isDebug") as isDebug:
+    with open("isDebug") as isDebug:
         isDebug = isDebug.readlines()[0][0]
         if isDebug == "0":
             DEBUG = False
@@ -31,7 +31,7 @@ try:
 except Exception as e:
     #raise Exception(e.message +)
     #print e.message
-    raise e
+    raise Exception(e.message + msg)
 ALLOWED_HOSTS = [
     "127.0.0.1",
 ]

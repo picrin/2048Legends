@@ -1,0 +1,3 @@
+#!/bin/bash
+docker push picrin/2048_gunicorn
+docker push picrin/2048_nginx
