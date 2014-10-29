@@ -1,2 +1,3 @@
 #!/bin/bash
+docker pull picrin/2048_nginx &&
 docker pull picrin/2048_nginx

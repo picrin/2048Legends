@@ -1,0 +1,3 @@
+#!/bin/bash
+docker run --net host -p 80:80 -t picrin/2048_nginx &
+docker run --net host -p 8000:8000 -t picrin/gunicorn &
