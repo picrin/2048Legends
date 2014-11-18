@@ -15,5 +15,6 @@ urlpatterns = patterns('',
     url(r'^register$', views.register),
     url(r'^signout$', views.logout),
     url(r'^leaderboard$', views.leaderboard),
+    url(r'^bitcointest$', views.bitcointest),
     url(r'^user/\w{3,16}$', views.user),
 )

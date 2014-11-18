@@ -13,6 +13,11 @@ import re
 import json
 from queries import *
 
+#returning *ok* so the api does not block us
+def bitcointest(request):
+    print request.GET
+    return HttpResponse("*ok*")
+
 def index(request):
     useragent = request.META['HTTP_USER_AGENT']
     goodBrowsers = ["Opera", "Lunascape", "Sleipnir"]
