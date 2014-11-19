@@ -45,7 +45,7 @@ def processAndRender(request, path, templateVars = None):
         username = user.login
         templateData["authenticated"] = True
         templateData["username"] = username
-        templateData["plays_remaining"] = (user is not None ? user.gamesRemaining: 0)
+        templateData["plays_remaining"] = user.gamesRemaining
     else:
         templateData["authenticated"] = False
     templateVars.update(templateData)
