@@ -189,11 +189,14 @@ def user(request):
     people = Person.objects.filter(login = username)
     if not people:
         raise Http404()
-    templateVars = {"results": genPersonal(people[0]), "username": username}
+    templateVars = {"results": genPersonal(people[0]), "transactions":genTransactions(people[0]), "username": username}
     return processAndRender(request, "user.html", templateVars)
 
 def genPersonal(person):
     return [game.result for game in Game.objects.filter(belongs_to=person).order_by("-result") if game.result is not None]
+    
+def genTransactions(person):
+    return [transaction for transaction in person.transaction_set.order_by("date_created")]
 
 def genLeaders():
     for game in Game.objects.all().order_by('-result'):
