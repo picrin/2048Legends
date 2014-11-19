@@ -39,12 +39,14 @@ def newGame(user):
 def processAndRender(request, path, templateVars = None):
     if templateVars is None:
         templateVars = {}
-    username = token_to_username(request)
+    user = token_to_user(request)
     print "username", username
     templateData = {}
-    if username is not None:
+    if user is not None:
+        username = user.login
         templateData["authenticated"] = True
         templateData["username"] = username
+        templateData["plays_remaining"] = user.gamesRemaining
     else:
         templateData["authenticated"] = False
     templateVars.update(templateData)
