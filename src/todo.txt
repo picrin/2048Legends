@@ -1,0 +1,11 @@
+Things to do:
+  
+  * rename/change url path for callbacks
+  * get rid of the global variables in views that contain stuff like our web address, wallet id, etc.
+  * make variable names consistent (eg. plays, gamesRemaining, etc.)
+  * change what happens when a payment is processed that does not have an associated transaction
+    database entry. Currently we simply print an error message and quit. this should not happen.
+    we should record the occurence of the payment, credit the user's account with more plays regardless,
+    and notify them by email.
+  * create some html/css/javascript frontend for the payment system
+  * make sure the current system is compatible with special offers/packs

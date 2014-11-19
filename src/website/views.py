@@ -35,21 +35,18 @@ def validate_callback(get_response):
 #   # respond with an "*ok*"
 
 def bitcointestcallback(request):
-    global OUT_WALLET, OUR_URL, GAME_COST
-    print "Got a callback from bc info: \n\n", request.GET
-    
     is_valid, error_message = validate_callback(request.GET)
     if not is_valid:
         print "RECIEVED A MALFORMED/ILLEGAL CALLBACK. Error message:", error_message, "\n\n", request.GET
         return HttpResponse("*ok*")
-    else:
-        print "Recieved a valid callback:", "\n\n", request.GET
     
     input_address = request.GET.get("input_address")
     destination_address = request.GET.get("destination_address")
     transaction_secret = request.GET.get("secret")
     value = request.GET.get("value")
     value = float(value)/100000000.0 #changing value from satoshi to bitcoin
+    
+    print "RECIEVED CALLBACK", input_address, transaction_secret, value 
     
     #checking that the destination address matches ours.
     if destination_address != OUR_WALLET:
