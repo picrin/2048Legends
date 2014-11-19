@@ -16,7 +16,7 @@ import urllib2
 import json
 from queries import *
 
-OUR_WALLET = '1AmJngpg1Sg61h7Vai3ChSpm5KvwmBchAN'
+OUR_WALLET = '1Li2pXrVbuM4ga3HsoA6RPLSQPfrxYBJKA'
 OUR_URL = '54.148.181.174'
 GAME_COST = 0.0005 #setting the minimum amount the ai will allow for just now.
 
@@ -196,7 +196,7 @@ def genPersonal(person):
     return [game.result for game in Game.objects.filter(belongs_to=person).order_by("-result") if game.result is not None]
     
 def genTransactions(person):
-    return [transaction for transaction in person.transaction_set.order_by("date_created")]
+    return [transaction for transaction in person.transaction_set.order_by("-date_created")]
 
 def genLeaders():
     for game in Game.objects.all().order_by('-result'):
