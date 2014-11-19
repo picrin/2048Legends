@@ -79,14 +79,14 @@ def bitcointestcallback(request):
         return HttpResponse("*ok*")
         
     if value != transaction.intended_currency:
-        print "WARNING: transaction's value", value, " does not match the intended value of", transaction.intended_currency + ". The user will recieve as many plays as they are able to afford with aforementioned amount."
+        print "WARNING: transaction's value", value, " does not match the intended value of", transaction.intended_currency, ". The user will recieve as many plays as they are able to afford with aforementioned amount."
     
     #finding out how many games the bitcoins can buy.
     plays = int(value/GAME_COST)
     
     #getting the person from the transaction and updating their play count with the new amount of games.
     person = transaction.belongs_to
-    print person.login, "with current balance", person.gamesRemaining, "will be given", plays + "."
+    print person.login, "with current balance", person.gamesRemaining, "will be given", plays
     
     person.gamesRemaining = person.gamesRemaining + plays
     person.save()
