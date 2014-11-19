@@ -118,7 +118,7 @@ def get_new_input_address(transaction_secret):
     global OUR_WALLET, OUR_URL
     
     url =   'https://www.blockchain.info/api/receive?method=create&cors=true&format=plain&address=' \
-            + OUR_WALLET + '&shared=false&callback=https%3A%2F%2F' + OUR_URL + '%2Fbitcointestcallback%3Fsecret%3D' \
+            + OUR_WALLET + '&shared=false&callback=http%3A%2F%2F' + OUR_URL + '%2Fbitcointestcallback%3Fsecret%3D' \
             + transaction_secret
     
     serialized_data = urllib2.urlopen(url).read()
