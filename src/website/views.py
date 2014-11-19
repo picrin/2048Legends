@@ -71,7 +71,7 @@ def bitcointestcallback(request):
         return HttpResponse("*ok*")
     
     #checking that the value is a valid amount and matches the transaction
-    if not(value > GAME_COST):
+    if not(value < GAME_COST):
         print "ERROR: transaction's value", value, " is not a valid amount."
         return HttpResponse("*ok*")
         
