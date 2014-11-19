@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.http import Http404, HttpResponseServerError, HttpResponseForbidden
+from django.utils.http import urlquote
 from models import Person, Transaction, Tokena, Game, Move
 import move_logic
 import datetime
@@ -56,10 +57,9 @@ def bitcointestcallback(request):
         return HttpResponse("*ok*")
     
     #finding the transaction in the database for this payment
-    transaction = Transaction.objects.get(wallet_id=input_address)
-    
-    #checking if the transaction exists
-    if transaction is None:
+    try:
+        transaction = Transaction.objects.get(wallet_id=input_address)
+    except Transaction.DoesNotExist:
         print "ERROR: matching transaction cannot be found in database for input_address", input_address
         return HttpResponse("*ok*")
     
@@ -117,10 +117,11 @@ def validate_buy(intended_games, intended_cost, person):
 def get_new_input_address(transaction_secret):
     global OUR_WALLET, OUR_URL
     
-    url =   'https://www.blockchain.info/api/receive?method=create&cors=true&format=plain&address='+ OUR_WALLET + '&shared=false&callback=http%3A%2F%2F' + OUR_URL + '%2Fbitcointestcallback%3Fsecret%3D' + transaction_secret
+    callback_url = urlquote('http://' + OUR_URL + '/bitcointestcallback?secret=' + transaction_secret)
+    url =   'http://www.blockchain.info/api/receive?method=create&cors=true&format=plain&address='+ OUR_WALLET + '&shared=false&callback=' + callback_url
     
-    serialized_data = urllib2.urlopen(url).read()
-    data = json.loads(serialized_data)
+    return_data = urllib2.urlopen(url).read()
+    data = json.loads(return_data)
     print data
     
     return data.get('input_address')
