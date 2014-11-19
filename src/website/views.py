@@ -48,7 +48,7 @@ def bitcointestcallback(request):
     destination_address = request.GET.get("destination_address")
     transaction_secret = request.GET.get("secret")
     value = request.GET.get("value")
-    value = value/100000000.0 #changing value from satoshi to bitcoin
+    value = float(value)/100000000.0 #changing value from satoshi to bitcoin
     
     #checking that the destination address matches ours.
     if destination_address != OUR_WALLET:
@@ -117,9 +117,7 @@ def validate_buy(intended_games, intended_cost, person):
 def get_new_input_address(transaction_secret):
     global OUR_WALLET, OUR_URL
     
-    url =   'https://www.blockchain.info/api/receive?method=create&cors=true&format=plain&address=' \
-            + OUR_WALLET + '&shared=false&callback=http%3A%2F%2F' + OUR_URL + '%2Fbitcointestcallback%3Fsecret%3D' \
-            + transaction_secret
+    url =   'https://www.blockchain.info/api/receive?method=create&cors=true&format=plain&address='+ OUR_WALLET + '&shared=false&callback=http%3A%2F%2F' + OUR_URL + '%2Fbitcointestcallback%3Fsecret%3D' + transaction_secret
     
     serialized_data = urllib2.urlopen(url).read()
     data = json.loads(serialized_data)
