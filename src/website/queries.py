@@ -40,7 +40,6 @@ def processAndRender(request, path, templateVars = None):
     if templateVars is None:
         templateVars = {}
     user = token_to_user(request)
-    print "username", username
     templateData = {}
     if user is not None:
         username = user.login
