@@ -8,7 +8,7 @@ function buyButtonCallback(response) {
 }
 
 $("#buybutton").click(function(c){
-  var numberOfGames = parseInt($("#buybutton").value);
+  var numberOfGames = $("#gamesinput").val();
   
   var priceForGames = getPriceForGames(numberOfGames);
   alert("YO YO YO"+priceForGames);
