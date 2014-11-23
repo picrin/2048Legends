@@ -156,7 +156,9 @@ def buybuttonclick(request):
         input_address = get_new_input_address(transaction_secret)
     
         #creating the transaction database entry and saving it to the database.
-        transaction = Transaction(belongs_to=person, wallet_id=input_address, transaction_secret=transaction_secret, intended_plays=intended_plays, intended_currency=intended_currency)
+        transaction =   Transaction(belongs_to=person, wallet_id=input_address, \
+                        transaction_secret=transaction_secret, intended_plays=intended_plays, \
+                        intended_currency=intended_currency)
         transaction.save()
         
         #setting the walled id for the return information
@@ -181,6 +183,10 @@ def index(request):
 
 def play(request):
     return processAndRender(request, 'play.html', templateVars={"active_play": True})
+    #return HttpResponse(str(Game.objects.all()[0].lastMove.board))
+    
+def buy(request):
+    return processAndRender(request, 'buy.html', templateVars={})
     #return HttpResponse(str(Game.objects.all()[0].lastMove.board))
 
 def user(request):
