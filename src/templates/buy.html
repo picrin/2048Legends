@@ -21,8 +21,5 @@
   
 {% block scripts %}
   <link href="static/css/buy.css" rel="stylesheet" type="text/css">
-  <script>
-    var pricePerGame = 0.005; //this wil be replaced with a django variable at some point.
-  </script>
-  <script src="static/js/buy.js" type="application/javascript"></script>
+  <script src="static/js/buy.js" type="application/javascript">var pricePerGame = 0.005; //this wil be replaced with a django variable at some point.</script>
 {% endblock %}
