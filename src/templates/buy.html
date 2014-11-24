@@ -15,7 +15,9 @@
             <p>I'm so down for buying <input type="text" class="form-control bfh-number" id="gamesinput" style="width:90px"> games.</p>
         </div>
       </div>
-      <input type="submit" value="Buy Those Games!" class="btn-success btn-lg" id="buybutton" style="width:40%; float:right;">
+      <div>
+        <input type="submit" value="Buy Those Games!" class="btn-success btn-lg" id="buybutton" style="width:40%; float:right;">
+      </div>
     </div>
     
   {% endblock %}
@@ -23,7 +25,7 @@
 {% block scripts %}
   <link href="static/css/buy.css" rel="stylesheet" type="text/css">
   <script>
-    var pricePerGame = 0.005; //this wil be replaced with a django variable at some point.
+    var pricePerGame = {{PRICE_PER_GAME}}; //this wil be replaced with a django variable at some point.
   </script>
   <script src="static/js/buy.js" type="application/javascript"></script>
 {% endblock %}
