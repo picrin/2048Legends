@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+#declaring some global variables
+OUR_WALLET = '1Li2pXrVbuM4ga3HsoA6RPLSQPfrxYBJKA'
+OUR_URL = '54.148.181.174'
+GAME_COST = 0.0005 #setting the minimum amount the ai will allow for just now.
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
