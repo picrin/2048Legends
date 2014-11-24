@@ -183,7 +183,7 @@ def play(request):
     #return HttpResponse(str(Game.objects.all()[0].lastMove.board))
     
 def buy(request):
-    return processAndRender(request, 'buy.html', templateVars={'PRICE_PER_GAME':})
+    return processAndRender(request, 'buy.html', templateVars={'PRICE_PER_GAME':settings.GAME_COST})
     #return HttpResponse(str(Game.objects.all()[0].lastMove.board))
 
 def user(request):
