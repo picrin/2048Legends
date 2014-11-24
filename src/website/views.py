@@ -112,7 +112,7 @@ def validate_buy(intended_games, intended_cost, person):
 def get_new_input_address(transaction_secret):
     global OUR_WALLET, OUR_URL
     
-    callback_url = urlquote('http://' + settins.OUR_URL + '/bitcointestcallback?secret=' + transaction_secret)
+    callback_url = urlquote('http://' + settings.OUR_URL + '/bitcointestcallback?secret=' + transaction_secret)
     url =   'http://www.blockchain.info/api/receive?method=create&cors=true&format=plain&address='+ settings.OUR_WALLET + '&shared=false&callback=' + callback_url
     
     return_data = urllib2.urlopen(url).read()
