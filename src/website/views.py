@@ -1,4 +1,5 @@
 #Copyright (c) Adam Kurkiewicz 2014, all rights reserved.
+from WC2048 import settings
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import RequestContext
