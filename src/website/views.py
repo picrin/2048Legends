@@ -47,7 +47,7 @@ def bitcointestcallback(request):
     print "RECIEVED CALLBACK", input_address, transaction_secret, value 
     
     #checking that the destination address matches ours.
-    if destination_address != OUR_WALLET:
+    if destination_address != settings.OUR_WALLET:
         print "ERROR: destination address", destination_address, " does not match OUR_WALLET address."
         return HttpResponse("*ok*")
     
@@ -77,7 +77,7 @@ def bitcointestcallback(request):
         print "WARNING: transaction's value", value, " does not match the intended value of", transaction.intended_currency, ". The user will recieve as many plays as they are able to afford with aforementioned amount."
     
     #finding out how many games the bitcoins can buy.
-    plays = int(value/GAME_COST)
+    plays = int(value/settings.GAME_COST)
     
     #getting the person from the transaction and updating their play count with the new amount of games.
     person = transaction.belongs_to
@@ -112,8 +112,8 @@ def validate_buy(intended_games, intended_cost, person):
 def get_new_input_address(transaction_secret):
     global OUR_WALLET, OUR_URL
     
-    callback_url = urlquote('http://' + OUR_URL + '/bitcointestcallback?secret=' + transaction_secret)
-    url =   'http://www.blockchain.info/api/receive?method=create&cors=true&format=plain&address='+ OUR_WALLET + '&shared=false&callback=' + callback_url
+    callback_url = urlquote('http://' + settins.OUR_URL + '/bitcointestcallback?secret=' + transaction_secret)
+    url =   'http://www.blockchain.info/api/receive?method=create&cors=true&format=plain&address='+ settings.OUR_WALLET + '&shared=false&callback=' + callback_url
     
     return_data = urllib2.urlopen(url).read()
     data = json.loads(return_data)
