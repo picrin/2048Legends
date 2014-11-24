@@ -16,9 +16,6 @@ import urllib2
 import json
 from queries import *
 
-OUR_WALLET = '1Li2pXrVbuM4ga3HsoA6RPLSQPfrxYBJKA'
-OUR_URL = '54.148.181.174'
-GAME_COST = 0.0005 #setting the minimum amount the ai will allow for just now.
 
 #checks that the callback contains all of the required fields
 def validate_callback(get_response):
