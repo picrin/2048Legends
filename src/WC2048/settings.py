@@ -33,7 +33,7 @@ except Exception as e:
     #print e.message
     raise Exception(e.message + msg)
 ALLOWED_HOSTS = [
-    "127.0.0.1",
+    "*",
 ]
 
 # SECURITY WARNING: keep the secret key used in production secret!

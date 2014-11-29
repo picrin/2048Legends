@@ -1,3 +1,3 @@
 #!/bin/bash
-docker run -d --name gunicorn -t picrin/gunicorn 
-docker run -d -p 80:80 --link=gunicorn:gunicorn -t picrin/2048_nginx 
+docker run -d --name gunicorn -t picrin/2048_gunicorn 
+docker run -d -p 80:80 --link=gunicorn:gunicorn -t picrin/2048_nginx
