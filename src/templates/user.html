@@ -22,6 +22,26 @@
         {% endfor %}
       </tbody>
     </table>
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>
+            {{username}}'s Previous Transactions
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for transaction in transactions %}
+        <tr>
+          <td>{{transaction.date_created}}</td>
+          <td>Paid to: {{transaction.wallet_id}}</td>
+          <td>Payment: {{transaction.recieved_currency}}</td>
+          <td>Games:{{transaction.recieved_games}}</td>
+          <td>Completed: {{transaction.date_completed}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 {% endblock %}
 

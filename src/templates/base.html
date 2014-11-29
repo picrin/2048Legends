@@ -31,7 +31,7 @@
         <div class="collapse navbar-collapse"  style="font-size:20px" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav navbar-left">
             <li {% if active_play %} class="active" {% endif %}><a href="/play">Play</a></li>
-            <li {% if active_buy %} class="active" {% endif %}><a href="#">Buy games (3 left)</a></li>
+            <li {% if active_buy %} class="active" {% endif %}><a href="#">Buy games ({{plays_remaining}} left)</a></li>
             <li {% if active_leaderboard %} class="active" {% endif %}><a href="/leaderboard">Leaderboard</a></li>
             <li {% if active_about %} class="active" {% endif %}><a href="#">About</a></li>
           </ul>
