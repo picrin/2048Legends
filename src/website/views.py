@@ -110,7 +110,6 @@ def validate_buy(intended_games, intended_cost, person):
 
 #gets a new input address from bc info and returns it. takes a transaction_secret to put in the callback url
 def get_new_input_address(transaction_secret):
-    global OUR_WALLET, OUR_URL
     
     callback_url = urlquote('http://' + settings.OUR_URL + '/bitcointestcallback?secret=' + transaction_secret)
     url =   'http://www.blockchain.info/api/receive?method=create&cors=true&format=plain&address='+ settings.OUR_WALLET + '&shared=false&callback=' + callback_url

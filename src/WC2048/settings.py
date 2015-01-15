@@ -8,20 +8,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
-#declaring some global variables
-OUR_WALLET = '1Li2pXrVbuM4ga3HsoA6RPLSQPfrxYBJKA'
-OUR_URL = '54.148.181.174'
-GAME_COST = 0.0005 #setting the minimum amount the ai will allow for just now.
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
-
-
-# SECURITY WARNING: don't run with debug turned on in production!
+# keep debug intialisation at the top of the file so that we always know if we're in debug or production
 msg = "isDebug file is expected to consist of a single charcter 0 or 1"
 try:
     with open("isDebug") as isDebug:
@@ -36,15 +23,36 @@ except Exception as e:
     #raise Exception(e.message +)
     #print e.message
     raise Exception(e.message + msg)
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+# declaring some global variables
+# this pretty much is a setting. 
+OUR_WALLET = '1Li2pXrVbuM4ga3HsoA6RPLSQPfrxYBJKA'
+
+OUR_URL = os.getenv('EXTERNALIP', None) 
+if OUR_URL == None and not DEBUG:
+    raise Exception("blowing up -- need correct external IP of the server")
+if OUR_URL == None and DEBUG:
+    OUR_URL = "127.0.0.1" # that's an obviously dummy address.
+
+GAME_COST = 0.0005 #setting the minimum amount the ai will allow for just now.
+
 ALLOWED_HOSTS = [
     "*",
 ]
 
 # SECURITY WARNING: keep the secret key used in production secret!
 if not DEBUG:
-    import binascii
-    with open("/dev/urandom", 'rb') as f:
-        SECRET_KEY = binascii.hexlify(f.read(32))
+    try:
+        SECRET_KEY
+    except NameError: 
+        import binascii
+        keyassigned = "randomly generated key" 
+        with open("/dev/urandom", 'rb') as f:
+            SECRET_KEY = binascii.hexlify(f.read(32))
 if DEBUG:
     SECRET_KEY = '1337'
 
@@ -53,7 +61,6 @@ TEMPLATE_DEBUG = True
 TEMPLATE_DIRS=(
     os.path.join(BASE_DIR, 'templates'),
 )
-
 
 # Application definition
 
